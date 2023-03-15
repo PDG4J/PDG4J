@@ -1,6 +1,5 @@
 package ru.hse.pdg4j;
 
-import fr.inria.controlflow.ControlFlowBuilder;
 import ru.hse.pdg4j.api.*;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
@@ -8,10 +7,6 @@ import ru.hse.pdg4j.impl.task.basic.LauncherTask;
 import ru.hse.pdg4j.impl.task.basic.MethodExtractionTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
-import spoon.Launcher;
-import spoon.SpoonModelBuilder;
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtType;
 
 import java.io.File;
 
@@ -45,25 +40,5 @@ public class Main {
                 e.printStackTrace();
             }
         });
-    }
-
-    public static void main1(String[] args) {
-        Launcher launcher = new Launcher();
-        launcher.addInputResource("C:\\Users\\me\\IdeaProjects\\PDG4J\\src\\test\\sampleProject\\src");
-        launcher.getEnvironment().setComplianceLevel(11);
-        launcher.getEnvironment().setShouldCompile(true);
-        launcher.getEnvironment().setCommentEnabled(true);
-        launcher.run();
-        SpoonModelBuilder compiler = launcher.createCompiler();
-        boolean success = compiler.compile(SpoonModelBuilder.InputType.CTTYPES);
-        System.out.println(success);
-        for (CtType<?> clazz : launcher.getFactory().Class().getAll()) {
-            System.out.println("CFG for clazz " + clazz.getQualifiedName());
-            for (CtMethod<?> method : clazz.getMethods()) {
-                System.out.println("Of method " + method.getSimpleName() + ":");
-                System.out.println(new ControlFlowBuilder().build(method).toGraphVisText());
-                System.out.println();
-            }
-        }
     }
 }

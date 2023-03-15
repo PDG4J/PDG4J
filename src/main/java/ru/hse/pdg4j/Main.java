@@ -4,6 +4,7 @@ import fr.inria.controlflow.ControlFlowBuilder;
 import ru.hse.pdg4j.api.*;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
+import ru.hse.pdg4j.impl.task.basic.MethodExtractionTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 import ru.hse.pdg4j.impl.task.basic.LauncherTask;
@@ -16,13 +17,14 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        File sources = new File("C:\\Users\\me\\IdeaProjects\\PDG4J\\src\\test\\sampleProject\\src\\main\\java");
-        File exportRoot = new File("C:\\Users\\me\\IdeaProjects\\PDG4J\\src\\test\\sampleProject\\out");
-        String[] classpath = "C:\\Users\\me\\IdeaProjects\\PDG4J\\src\\test\\sampleProject\\build\\dependencies\\guava-24.0-jre.jar".split(";");
+        File sources = new File("src\\test\\sampleProject\\src\\main\\java");
+        File exportRoot = new File("src\\test\\sampleProject\\out");
+        String[] classpath = "src\\test\\sampleProject\\build\\dependencies\\guava-24.0-jre.jar".split(";");
 
         FlowPipeline flowPipeline = new SimpleFlowPipeline("PDG4J");
         PipelineGraphNode graph = new PipelineGraphBuilder()
                 .task(new LauncherTask(sources, classpath))
+                .task(new MethodExtractionTask())
                 .task(new ControlFlowGraphTask())
                 .task(new ControlFlowGraphExportTask(exportRoot))
                 .build();

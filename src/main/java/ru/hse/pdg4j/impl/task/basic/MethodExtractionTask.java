@@ -21,7 +21,7 @@ public class MethodExtractionTask implements PipelineTask<MethodExtractionTask.C
 
     @Override
     public String getName() {
-        return "methodExtraction";
+        return "Extract methods";
     }
 
     @Override

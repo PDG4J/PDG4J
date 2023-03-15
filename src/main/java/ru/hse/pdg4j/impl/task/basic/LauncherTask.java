@@ -31,7 +31,7 @@ public class LauncherTask implements PipelineTask<LauncherTask.Context> {
 
     @Override
     public String getName() {
-        return "launcher";
+        return "Initial source inspection";
     }
 
     @Override

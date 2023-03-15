@@ -26,7 +26,7 @@ public class ControlFlowGraphTask implements PipelineTask<ControlFlowGraphTask.C
 
     @Override
     public String getName() {
-        return "CFG";
+        return "Build CFG";
     }
 
     @Override

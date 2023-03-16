@@ -4,8 +4,8 @@ PoC Analyser for Java source code utilising Program Dependence Graph
 
 ## Build
 
-This project uses unpublished modules from [https://github.com/INRIA/spoon](Spoon).  
-Our team has made a [https://github.com/pdg4j/spoon](fork) of it to bump up maven plugins & make these modules publishable.
+This project uses unpublished modules from [Spoon](https://github.com/INRIA/spoon).  
+Our team has made a [fork](https://github.com/pdg4j/spoon) of it to bump up maven plugins & make these modules publishable.
 
 First of all, we need to install these packages locally:
 ```shell

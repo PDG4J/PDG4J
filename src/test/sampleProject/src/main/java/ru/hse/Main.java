@@ -5,9 +5,16 @@ import com.google.common.collect.Streams;
 import java.util.stream.Stream;
 
 public class Main {
+
     public static void main(String[] args) {
-        var first = Stream.of(1, 2);
-        var second = Stream.of(2, 3);
-        Streams.zip(first, second, Integer::sum).forEach(System.out::println);
+        int a = 0, b = 0, c = 0, d = 0;
+        for (int i = 1; i < 100; ++i) {
+            a = b + 10;
+            if (a > 10) {
+                continue;
+            }
+            c = a;
+            continue;
+        }
     }
 }

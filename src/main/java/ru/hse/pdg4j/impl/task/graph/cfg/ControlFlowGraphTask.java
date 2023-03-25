@@ -16,7 +16,7 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlFlowGraphTask implements PipelineTask<ControlFlowGraphTask.Context> {
-    record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
+    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
     }
 
     public ControlFlowGraphTask() {

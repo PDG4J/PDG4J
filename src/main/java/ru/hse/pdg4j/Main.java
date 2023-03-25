@@ -13,6 +13,7 @@ import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 import java.io.File;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowExportTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
 
 public class Main {
@@ -28,6 +29,7 @@ public class Main {
                 .task(new ControlFlowGraphTask())
                 .task(new ControlFlowGraphExportTask(exportRoot))
                 .task(new PreprocessControlFlowTask("main"))
+                .task(new PreprocessControlFlowExportTask(exportRoot))
                 .task(new PostDominatorTreeTask("main"))
                 .task(new PostDominatorTreeExportTask(exportRoot))
                 .task(new ControlDependenceGraphTask("main"))

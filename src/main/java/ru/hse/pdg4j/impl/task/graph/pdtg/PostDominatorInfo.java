@@ -4,17 +4,17 @@ import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.ControlFlowNode;
 
 public class PostDominatorInfo {
-    private ControlFlowGraph graph;
+    private ConditionalGraph graph;
     private ControlFlowNode start;
     private ControlFlowNode end;
 
-    public PostDominatorInfo(ControlFlowGraph graph, ControlFlowNode start, ControlFlowNode end) {
+    public PostDominatorInfo(ConditionalGraph graph, ControlFlowNode start, ControlFlowNode end) {
         this.graph = graph;
         this.start = start;
         this.end = end;
     }
 
-    public ControlFlowGraph getControlFlowGraph() {
+    public ConditionalGraph getControlFlowGraph() {
         return  this.graph;
     }
 

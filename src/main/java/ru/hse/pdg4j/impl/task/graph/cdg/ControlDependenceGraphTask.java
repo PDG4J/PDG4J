@@ -1,16 +1,13 @@
 package ru.hse.pdg4j.impl.task.graph.cdg;
 
 import fr.inria.controlflow.ControlFlowGraph;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeGraph;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask.Context;
+import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorInfo;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
@@ -19,13 +16,12 @@ import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskContext;
 import ru.hse.pdg4j.api.PipelineTaskResult;
-import ru.hse.pdg4j.impl.task.util.IdleTask;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlDependenceGraphTask implements PipelineTask<ControlDependenceGraphTask.Context> {
 
-    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
+    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
 
     private ControlDependenceGraphTask.Context context;
@@ -48,11 +44,11 @@ public class ControlDependenceGraphTask implements PipelineTask<ControlDependenc
 
     @Override
     public PipelineTaskResult run(PipelineContext context) {
-        Map<CtMethod<?>, ControlFlowGraph> controlFlowGraphMap = new HashMap<>();
+        Map<CtMethod<?>, ConditionalGraph> controlFlowGraphMap = new HashMap<>();
         var postDominatorContext = context.getContext(PostDominatorTreeTask.Context.class);
-        var basicControlFlows = context.getContext(ControlFlowGraphTask.Context.class).graphMap();
+        var basicControlFlows = context.getContext(PreprocessControlFlowTask.Context.class).graphMap();
 
-        for (Map.Entry<CtMethod<?>, PostDominatorInfo> entry : postDominatorContext.infoMap().entrySet()) {
+        for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : postDominatorContext.infoMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
             if (!ctMethod.getSimpleName().equals(this.methodName)) {
                 continue;
@@ -68,6 +64,6 @@ public class ControlDependenceGraphTask implements PipelineTask<ControlDependenc
 
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
-        return List.of(PostDominatorTreeTask.class, ControlFlowGraphTask.class);
+        return List.of(PostDominatorTreeTask.class);
     }
 }

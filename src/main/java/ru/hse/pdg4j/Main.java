@@ -5,10 +5,15 @@ import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
 import ru.hse.pdg4j.impl.task.basic.LauncherTask;
 import ru.hse.pdg4j.impl.task.basic.MethodExtractionTask;
+import ru.hse.pdg4j.impl.task.graph.cdg.ControlDependenceGraphTask;
+import ru.hse.pdg4j.impl.task.graph.cfg.ControlDependenceGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 
 import java.io.File;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
 
 public class Main {
     public static void main(String[] args) {
@@ -22,6 +27,11 @@ public class Main {
                 .task(new MethodExtractionTask())
                 .task(new ControlFlowGraphTask())
                 .task(new ControlFlowGraphExportTask(exportRoot))
+                .task(new PreprocessControlFlowTask("main"))
+                .task(new PostDominatorTreeTask("main"))
+                .task(new PostDominatorTreeExportTask(exportRoot))
+                .task(new ControlDependenceGraphTask("main"))
+                .task(new ControlDependenceGraphExportTask(exportRoot))
                 .build();
 
         flowPipeline.run(graph, new PipelineExecutionListener() {

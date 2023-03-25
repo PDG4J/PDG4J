@@ -42,9 +42,10 @@ public class PostDominatorTreeExportTask implements PipelineTask<IdleTask.Contex
         }
 
         var graphContext = context.getContext(PostDominatorTreeTask.Context.class);
-        for (Map.Entry<CtMethod<?>, PostDominatorInfo> entry : graphContext.infoMap().entrySet()) {
+        for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.infoMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            ControlFlowGraph controlFlowGraph = entry.getValue().getControlFlowGraph();
+
+            ConditionalGraph controlFlowGraph = entry.getValue();
             File destination = new File(destinationFolder, this.pdtg + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {

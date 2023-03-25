@@ -10,21 +10,18 @@ import java.util.Map;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskContext;
-import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask.Context;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 import spoon.reflect.code.CtComment.CommentType;
 import spoon.reflect.declaration.CtMethod;
 import spoon.support.reflect.code.CtCommentImpl;
-import spoon.support.reflect.code.CtLocalVariableImpl;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PreprocessControlFlowTask implements PipelineTask<PreprocessControlFlowTask.Context> {
-    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
+    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
-
 
     private Context context;
 
@@ -46,7 +43,7 @@ public class PreprocessControlFlowTask implements PipelineTask<PreprocessControl
 
     @Override
     public PipelineTaskResult run(PipelineContext context) {
-        Map<CtMethod<?>, ControlFlowGraph> controlFlowGraphMap = new HashMap<>();
+        Map<CtMethod<?>, ConditionalGraph> conditionalGraphMap = new HashMap<>();
 
         var graphContext = context.getContext(ControlFlowGraphTask.Context.class);
         for (Map.Entry<CtMethod<?>, ControlFlowGraph> entry : graphContext.graphMap().entrySet()) {
@@ -55,24 +52,23 @@ public class PreprocessControlFlowTask implements PipelineTask<PreprocessControl
                 continue;
             }
             ControlFlowGraph controlFlowGraph = entry.getValue();
-            PostDominatorTreeGraph postDominatorTreeGraph = new PostDominatorTreeGraph(false);
+            ConditionalGraph graph = new ConditionalGraph();
             var edges = controlFlowGraph.edgeSet();
             for (var edge: edges) {
-                if (edge.getSourceNode().getStatement() != null)
-                    System.out.println(edge.getSourceNode().getStatement().getClass());
-                postDominatorTreeGraph.addEdge(edge.getSourceNode(), edge.getTargetNode());
+                graph.addEdge(edge.getSourceNode(), edge.getTargetNode(), edge.isBackEdge());
             }
             var comment = new CtCommentImpl();
             comment.setContent("ENTRY");
             comment.setCommentType(CommentType.BLOCK);
-            var ENTRYNODE = new ControlFlowNode(comment, postDominatorTreeGraph, BranchKind.STATEMENT);
-            postDominatorTreeGraph.addVertex(ENTRYNODE);
-            postDominatorTreeGraph.addEdge(ENTRYNODE, postDominatorTreeGraph.getStart());
-            postDominatorTreeGraph.addEdge(ENTRYNODE, postDominatorTreeGraph.getEnd());
 
-            controlFlowGraphMap.put(ctMethod, postDominatorTreeGraph);
+            var ENTRYNODE = new ConditionalGraphNode(comment, graph, BranchKind.BRANCH);
+            graph.addVertex(ENTRYNODE);
+            graph.addEdge(ENTRYNODE, graph.getStart());
+            graph.addEdge(ENTRYNODE, graph.getEnd());
+
+            conditionalGraphMap.put(ctMethod, graph);
         }
-        this.context = new PreprocessControlFlowTask.Context(controlFlowGraphMap);
+        this.context = new PreprocessControlFlowTask.Context(conditionalGraphMap);
 
         return success();
     }

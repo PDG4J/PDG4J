@@ -1,11 +1,9 @@
-package ru.hse.pdg4j.impl.task.graph.cfg;
+package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.ControlFlowGraph;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
-import ru.hse.pdg4j.impl.task.graph.cdg.ControlDependenceGraphTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import spoon.reflect.declaration.CtMethod;
 
@@ -19,17 +17,17 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
-public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.Context> {
+public class PreprocessControlFlowExportTask implements PipelineTask<IdleTask.Context> {
     private File destinationFolder;
-    private String controlDependenct = "CDG";
+    private static String pdtg = "PCFG";
 
-    public ControlDependenceGraphExportTask(File destinationFolder) {
+    public PreprocessControlFlowExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
     }
 
     @Override
     public String getName() {
-        return "Export CDG";
+        return "Export PCFG";
     }
 
     @Override
@@ -43,11 +41,12 @@ public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.C
             destinationFolder.mkdirs();
         }
 
-        var graphContext = context.getContext(ControlDependenceGraphTask.Context.class);
+        var graphContext = context.getContext(PreprocessControlFlowTask.Context.class);
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
+
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, controlDependenct + ctMethod.getSignature());
+            File destination = new File(destinationFolder, this.pdtg + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();
@@ -67,6 +66,6 @@ public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.C
 
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
-        return List.of(ControlDependenceGraphTask.class);
+        return List.of(PreprocessControlFlowTask.class);
     }
 }

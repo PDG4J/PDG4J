@@ -12,9 +12,9 @@ public class Main {
             a = b + 10;
             if (a > 10) {
                 continue;
+            } else {
+                continue;
             }
-            c = a;
-            continue;
         }
     }
 }

@@ -1,7 +1,6 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
-
 import java.util.HashMap;
 import java.util.Iterator;
 

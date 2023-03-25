@@ -141,9 +141,9 @@ public class Main {
                 System.out.println(12333);
                 a += 10;
                 continue;
+            } else {
+                continue;
             }
-            System.out.println(12333);
-            b += 10;
         }
 
         while (a < 100) {

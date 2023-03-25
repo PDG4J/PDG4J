@@ -2,13 +2,13 @@ package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
 import fr.inria.controlflow.ControlFlowEdge;
+import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.TransferFunctionVisitor;
 import fr.inria.controlflow.Value;
-import spoon.reflect.declaration.CtElement;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import spoon.reflect.declaration.CtElement;
 
 
 public class ConditionalGraphNode {

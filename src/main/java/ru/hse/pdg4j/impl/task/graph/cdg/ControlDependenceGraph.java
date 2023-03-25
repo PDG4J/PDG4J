@@ -13,8 +13,8 @@ import java.util.Set;
 public class ControlDependenceGraph {
     private final ConditionalGraph info;
     private final ConditionalGraph baseControlFlowGraph;
-    private final Integer nodeCounter = 0;
     private int counter = 0;
+    private final Integer nodeCounter = 0;
     private Set<ConditionalGraphNode> used;
     private Map<ConditionalGraphNode, Integer> in, out;
     private Map<ConditionalGraphNode, ConditionalGraphNode> parent;
@@ -39,7 +39,7 @@ public class ControlDependenceGraph {
 
         ConditionalGraph newGraph = new ConditionalGraph();
         dfs(info.getStart());
-        for (var edge : baseControlFlowGraph.edgeSet()) {
+        for (var edge: baseControlFlowGraph.edgeSet()) {
             process(edge, newGraph);
         }
         return newGraph;
@@ -48,7 +48,7 @@ public class ControlDependenceGraph {
     private void dfs(ConditionalGraphNode node) {
         used.add(node);
         in.put(node, ++counter);
-        for (var edge : info.outgoingEdgesOf(node)) {
+        for (var edge: info.outgoingEdgesOf(node)) {
             if (!used.contains(edge.getTarget())) {
                 dfs(edge.getTarget());
             }

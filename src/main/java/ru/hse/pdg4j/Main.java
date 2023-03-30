@@ -15,6 +15,8 @@ import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 
 import java.io.File;
+
+import ru.hse.pdg4j.impl.task.graph.dfg.DataFlowGraphTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowExportTask;
@@ -42,6 +44,7 @@ public class Main {
                 .task(new AddRegionalNodesGraphExportTask(exportRoot))
                 .task(new DeleteAdditionalNodesTask("main"))
                 .task(new DeleteAdditionalNodesExportTask(exportRoot))
+                .task(new DataFlowGraphTask())
                 .build();
 
         flowPipeline.run(graph, new PipelineExecutionListener() {

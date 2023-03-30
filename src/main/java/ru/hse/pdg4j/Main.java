@@ -5,7 +5,11 @@ import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
 import ru.hse.pdg4j.impl.task.basic.LauncherTask;
 import ru.hse.pdg4j.impl.task.basic.MethodExtractionTask;
+import ru.hse.pdg4j.impl.task.graph.cdg.AddRegionalNodesGraphExportTask;
+import ru.hse.pdg4j.impl.task.graph.cdg.AddRegionalNodesTask;
 import ru.hse.pdg4j.impl.task.graph.cdg.ControlDependenceGraphTask;
+import ru.hse.pdg4j.impl.task.graph.cdg.DeleteAdditionalNodesExportTask;
+import ru.hse.pdg4j.impl.task.graph.cdg.DeleteAdditionalNodesTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlDependenceGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
@@ -34,6 +38,10 @@ public class Main {
                 .task(new PostDominatorTreeExportTask(exportRoot))
                 .task(new ControlDependenceGraphTask("main"))
                 .task(new ControlDependenceGraphExportTask(exportRoot))
+                .task(new AddRegionalNodesTask("main"))
+                .task(new AddRegionalNodesGraphExportTask(exportRoot))
+                .task(new DeleteAdditionalNodesTask("main"))
+                .task(new DeleteAdditionalNodesExportTask(exportRoot))
                 .build();
 
         flowPipeline.run(graph, new PipelineExecutionListener() {

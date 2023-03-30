@@ -55,7 +55,7 @@ public class ControlDependenceGraphTask implements PipelineTask<ControlDependenc
             }
             var info = entry.getValue();
             var graph = new ControlDependenceGraph(basicControlFlows.get(ctMethod), info);
-            controlFlowGraphMap.put(ctMethod, graph);
+            controlFlowGraphMap.put(ctMethod, graph.getControlDependenceGraph());
         }
         this.context = new ControlDependenceGraphTask.Context(controlFlowGraphMap);
 

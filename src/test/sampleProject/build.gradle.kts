@@ -15,6 +15,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
 tasks.register("printClasspath") {
     println(configurations.asMap.keys)
     println(configurations["compileClasspath"].asPath)

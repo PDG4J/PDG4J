@@ -10,6 +10,11 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
 dependencies {
     implementation("fr.inria.gforge.spoon:spoon-core:10.3.0-beta-18")
     implementation("fr.inria.gforge.spoon:spoon-control-flow:0.0.2-SNAPSHOT")

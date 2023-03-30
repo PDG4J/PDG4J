@@ -20,7 +20,7 @@ import spoon.reflect.code.CtComment.CommentType;
 import spoon.reflect.path.impl.CtRolePathElement;
 import spoon.support.reflect.code.CtCommentImpl;
 
-public class ControlDependenceGraph extends ConditionalGraph {
+public class ControlDependenceGraph  {
     private ConditionalGraph info;
     private ConditionalGraph baseControlFlowGraph;
     private int counter = 0;
@@ -42,11 +42,17 @@ public class ControlDependenceGraph extends ConditionalGraph {
         in = new LinkedHashMap<>();
         out = new LinkedHashMap<>();
         parent = new LinkedHashMap<>();
+    }
 
+    public ConditionalGraph getControlDependenceGraph() {
+        init();
+
+        ConditionalGraph newGraph = new ConditionalGraph();
         dfs(info.getStart());
         for (var edge: baseControlFlowGraph.edgeSet()) {
-            process(edge);
+            process(edge, newGraph);
         }
+        return newGraph;
     }
 
     private void dfs(ConditionalGraphNode node) {
@@ -60,7 +66,7 @@ public class ControlDependenceGraph extends ConditionalGraph {
         out.put(node, ++counter);
     }
 
-    private void process(ConditionalEdge edge) {
+    private void process(ConditionalEdge edge, ConditionalGraph newGraph) {
         var source = edge.getSource();
         var target = edge.getTarget();
         if (in.get(target) == null || in.get(source) == null) {
@@ -75,29 +81,16 @@ public class ControlDependenceGraph extends ConditionalGraph {
         var tp = edge.getType();
         var tmp = source;
         while (target != null && !(in.get(target) < in.get(source) && out.get(source) < out.get(target))) {
-            if (!this.containsVertex(source)) {
-                this.addVertex(source);
+            if (!newGraph.containsVertex(source)) {
+                newGraph.addVertex(source);
             }
-            if (!this.containsVertex(target)) {
-                this.addVertex(target);
+            if (!newGraph.containsVertex(target)) {
+                newGraph.addVertex(target);
             }
-            var newEdge = this.addEdge(source, target);
+            var newEdge = newGraph.addEdge(source, target);
             newEdge.setBackEdge(edge.isBackEdge());
             newEdge.setType(tp);
-//            if (parent.get(target) == null) {
-//                var comment = new CtCommentImpl();
-//                comment.setContent("R" + (++nodeCounter).toString());
-//                comment.setCommentType(CommentType.BLOCK);
-//                var parentNode = new ConditionalGraphNode(comment, this);
-//                this.addVertex(parentNode);
-//                this.addEdge(tmp, parentNode);
-//                this.addEdge(parentNode, target);
-//                parent.put(target, parentNode);
-//                tmp = parentNode;
-//            } else {
-//                this.addEdge(tmp, parent.get(target));
-//                break;
-//            }
+
             var predEdge = this.info.incomingEdgesOf(target).stream().findFirst().orElse(null);
             if (predEdge == null) {
                 target = null;

@@ -53,10 +53,9 @@ public class PreprocessControlFlowTask implements PipelineTask<PreprocessControl
             }
             ControlFlowGraph controlFlowGraph = entry.getValue();
             ConditionalGraph graph = new ConditionalGraph();
-            var edges = controlFlowGraph.edgeSet();
-            for (var edge: edges) {
-                graph.addEdge(edge.getSourceNode(), edge.getTargetNode(), edge.isBackEdge());
-            }
+
+            graph.build(controlFlowGraph);
+
             var comment = new CtCommentImpl();
             comment.setContent("ENTRY");
             comment.setCommentType(CommentType.BLOCK);

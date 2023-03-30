@@ -1,11 +1,14 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
+import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.ControlFlowNode;
 import fr.inria.controlflow.GraphVisPrettyPrinter;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
@@ -17,14 +20,26 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
         super(new EdgeFactory<ConditionalGraphNode, ConditionalEdge>() {
             @Override
             public ConditionalEdge createEdge(ConditionalGraphNode node, ConditionalGraphNode v1) {
-                if (node.getKind() == BranchKind.BRANCH) {
-                    return new ConditionalEdge(node, v1, ConditionalEdgeType.TRUE);
-                }else {
-                    return new ConditionalEdge(node, v1, ConditionalEdgeType.NONE);
-                }
+                return new ConditionalEdge(node, v1, ConditionalEdgeType.NONE);
             }
         });
         mapToConditionalNode = new LinkedHashMap<>();
+    }
+
+    public void build(ControlFlowGraph graph) {
+        Set<ControlFlowNode> set = new HashSet<>();
+        var start = graph.findNodesOfKind(BranchKind.BEGIN).get(0);
+        dfs(graph, start, set);
+    }
+
+    public void dfs(ControlFlowGraph graph, ControlFlowNode node, Set<ControlFlowNode> set) {
+        set.add(node);
+        for (var edge: graph.outgoingEdgesOf(node)) {
+            this.addEdge(node, edge.getTargetNode(), edge.isBackEdge());
+            if (!set.contains(edge.getTargetNode())) {
+                dfs(graph, edge.getTargetNode(), set);
+            }
+        }
     }
 
     public ConditionalEdge addEdge(ControlFlowNode sourceNode, ControlFlowNode targetNode, boolean isBack) {
@@ -39,6 +54,23 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
             mapToConditionalNode.put(targetNode, target);
         }
 
+        return addEdge(source, target, isBack);
+    }
+
+    public ConditionalEdge addEdge(ConditionalGraphNode source, ConditionalGraphNode target, ConditionalEdgeType kind, boolean isBack) {
+        var edge = addEdge(source, target, isBack);
+        edge.setType(kind);
+        return edge;
+    }
+
+    public ConditionalEdge addEdge(ConditionalGraphNode source, ConditionalGraphNode target, ConditionalEdgeType kind) {
+        var edge = addEdgeBasic(source, target);
+        edge.setType(kind);
+        return edge;
+    }
+
+    public ConditionalEdge addEdgeBasic(ConditionalGraphNode source, ConditionalGraphNode target) {
+
         if (!this.containsVertex(source)) {
             this.addVertex(source);
         }
@@ -47,12 +79,43 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
             this.addVertex(target);
         }
 
-        var edge = (ConditionalEdge) super.addEdge(source, target);
-        if (source.getKind() == BranchKind.BRANCH && super.outDegreeOf(source) > 1) {
-            edge.setType(ConditionalEdgeType.FALSE);
+        if (this.containsEdge(source, target)) {
+            return this.getEdge(source, target);
         }
+
+        var edge = (ConditionalEdge) super.addEdge(source, target);
+        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT ) {
+            if (super.outDegreeOf(source) == 1) {
+                edge.setType(ConditionalEdgeType.TRUE);
+            } else {
+                edge.setType(ConditionalEdgeType.FALSE);
+            }
+        }
+        return edge;
+    }
+
+    public ConditionalEdge addEdge(ConditionalGraphNode source, ConditionalGraphNode target, boolean isBack) {
+        var edge = addEdgeBasic(source, target);
         edge.setBackEdge(isBack);
         return edge;
+    }
+
+    public ConditionalEdge addEdge(ConditionalEdge edge) {
+        var source = edge.getSource();
+        var target = edge.getTarget();
+
+        if (!this.containsVertex(source)) {
+            this.addVertex(source);
+        }
+
+        if (!this.containsVertex(target)) {
+            this.addVertex(target);
+        }
+
+        var newEdge = this.addEdge(source, target);
+        newEdge.setBackEdge(edge.isBackEdge());
+        newEdge.setType(edge.getType());
+        return newEdge;
     }
 
     public ConditionalEdge addEdge(ConditionalGraphNode source, ConditionalGraphNode target) {
@@ -65,8 +128,12 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
         }
 
         var edge = (ConditionalEdge) super.addEdge(source, target);
-        if (source.getKind() == BranchKind.BRANCH && super.outDegreeOf(source) > 1) {
-            edge.setType(ConditionalEdgeType.FALSE);
+        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT ) {
+            if (super.outDegreeOf(source) == 1) {
+                edge.setType(ConditionalEdgeType.TRUE);
+            } else {
+                edge.setType(ConditionalEdgeType.FALSE);
+            }
         }
         return edge;
     }

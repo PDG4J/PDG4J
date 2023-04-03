@@ -45,10 +45,10 @@ public class TextCheckReportExportStrategy implements CheckReportExportStrategy<
             builder.append("\n");
         }
 
-        builder.append("Order:").append('\n');
-        for (CheckReportEntry entry : entries) {
-            builder.append(entry).append(", ");
-        }
+        builder.append("Order: ")
+                .append(entries.stream()
+                        .map(CheckReportEntry::getName)
+                        .collect(Collectors.joining(", ")));
 
         return builder.toString().stripTrailing();
     }

@@ -1,14 +1,18 @@
 package ru.hse.pdg4j.impl.builder;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import ru.hse.pdg4j.api.PipelineGraphNode;
 import ru.hse.pdg4j.api.PipelineTask;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class PipelineGraphBuilder {
     private Map<String, List<String>> graph;
     private Map<String, PipelineTask<?>> nodeNames;
-    private Map<Class<? extends PipelineTask<?>>, PipelineTask<?>> taskMap;
+    private Multimap<Class<? extends PipelineTask>, PipelineTask<?>> taskMap;
 
     private class SimplePipelineGraphNode implements PipelineGraphNode {
         private PipelineTask<?> task;
@@ -41,12 +45,12 @@ public class PipelineGraphBuilder {
     public PipelineGraphBuilder() {
         this.graph = new HashMap<>();
         this.nodeNames = new HashMap<>();
-        this.taskMap = new HashMap<>();
+        this.taskMap = ArrayListMultimap.create();
     }
 
     public PipelineGraphBuilder task(PipelineTask<?> task, String... additionalDependencies) {
         nodeNames.put(task.getName(), task);
-        taskMap.put((Class<? extends PipelineTask<?>>) task.getClass(), task);
+        taskMap.put(task.getClass(), task);
         if (!graph.containsKey(task.getName())) {
             graph.put(task.getName(), new ArrayList<>());
         }
@@ -74,16 +78,38 @@ public class PipelineGraphBuilder {
 
         for (PipelineTask<?> value : taskMap.values()) {
             for (Class<? extends PipelineTask<?>> requirement : value.getRequirements()) {
-                if (!taskMap.containsKey(requirement)) {
-                    throw new IllegalStateException(
-                            "Could not find requirement for task named '%s'. Not found: %s"
-                                    .formatted(value.getName(), requirement.getName()));
-                }
-                PipelineTask<?> requirementTask = taskMap.get(requirement);
-                if (!graph.containsKey(requirementTask.getName())) {
-                    graph.put(requirementTask.getName(), new ArrayList<>(List.of(value.getName())));
+                List<Class<? extends PipelineTask>> implementations = new ArrayList<>();
+
+                if (Modifier.isAbstract(requirement.getModifiers())) {
+                    // Search through implementations
+                    for (Class<? extends PipelineTask> keyClass : taskMap.keySet()) {
+                        if (requirement.isAssignableFrom(keyClass)) {
+                            implementations.add(keyClass);
+                        }
+                    }
+                    if (implementations.isEmpty()) {
+                        throw new IllegalStateException(
+                                ("Could not find requirement for task named '%s'." +
+                                        " Could not find any implementations for abstract %s")
+                                        .formatted(value.getName(), requirement.getName()));
+                    }
                 } else {
-                    graph.get(requirementTask.getName()).add(value.getName());
+                    implementations.add(requirement);
+                }
+
+                for (Class<? extends PipelineTask> implementation : implementations) {
+                    if (!taskMap.containsKey(implementation)) {
+                        throw new IllegalStateException(
+                                "Could not find requirement for task named '%s'. Not found: %s"
+                                        .formatted(value.getName(), implementation.getName()));
+                    }
+                    for (PipelineTask<?> implementationTask : taskMap.get(implementation)) {
+                        if (!graph.containsKey(implementationTask.getName())) {
+                            graph.put(implementationTask.getName(), new ArrayList<>(List.of(value.getName())));
+                        } else {
+                            graph.get(implementationTask.getName()).add(value.getName());
+                        }
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package ru.hse.pdg4j.impl;
 
 import ru.hse.pdg4j.api.*;
+import ru.hse.pdg4j.api.check.task.CheckPipelineTask;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,12 +20,13 @@ public class SimpleFlowPipeline implements FlowPipeline {
     }
 
     @Override
-    public void run(PipelineGraphNode root, PipelineExecutionListener listener) {
+    public void run(PipelineGraphNode root, ExecutionListener listener) {
         if (!isAcyclic(root)) {
             throw new IllegalArgumentException("Provided task graph contains a cycle");
         }
 
         Queue<PipelineGraphNode> nodes = new ArrayDeque<>();
+        Set<PipelineTask<?>> executed = new HashSet<>();
         nodes.add(root);
 
         final AtomicReference<PipelineGraphNode> current = new AtomicReference<>(null);
@@ -38,10 +40,20 @@ public class SimpleFlowPipeline implements FlowPipeline {
             public PipelineTask<?> getRunning() {
                 return current.get().getTask();
             }
+
+            @Override
+            public Collection<PipelineTask<?>> getExecuted() {
+                return executed;
+            }
         };
 
+        boolean checksBlocked = false;
         while (!nodes.isEmpty()) {
             current.set(nodes.remove());
+            if (checksBlocked && current.get().getTask() instanceof CheckPipelineTask) {
+                nodes.addAll(current.get().getChildren());
+                continue;
+            }
             PipelineTask<?> task = current.get().getTask();
             try {
                 for (Class<? extends PipelineTask<?>> requirement : task.getRequirements()) {
@@ -53,12 +65,28 @@ public class SimpleFlowPipeline implements FlowPipeline {
                 }
                 PipelineTaskResult result = task.run(context);
                 context.put(task);
-                listener.onComplete(task, result, current.get());
+                listener.onComplete(task, result, current.get(), context);
+                if (task.isBlocking() && !result.isSuccessful()) {
+                    if (task instanceof CheckPipelineTask) {
+                        checksBlocked = true;
+                    } else {
+                        break;
+                    }
+                }
             } catch (Exception e) {
-                listener.onException(task, current.get(), e);
+                listener.onException(task, current.get(), e, context);
+                if (task instanceof CheckPipelineTask) {
+                    checksBlocked = true;
+                } else {
+                    break;
+                }
+            } finally {
+                executed.add(task);
             }
             nodes.addAll(current.get().getChildren());
         }
+
+        listener.onFinish(context);
     }
 
     private boolean isAcyclic(PipelineGraphNode root) {

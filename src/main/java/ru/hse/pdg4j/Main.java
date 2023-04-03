@@ -1,67 +1,47 @@
 package ru.hse.pdg4j;
 
+import picocli.CommandLine;
 import ru.hse.pdg4j.api.*;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
-import ru.hse.pdg4j.impl.task.basic.LauncherTask;
-import ru.hse.pdg4j.impl.task.basic.MethodExtractionTask;
-import ru.hse.pdg4j.impl.task.graph.cdg.AddRegionalNodesGraphExportTask;
-import ru.hse.pdg4j.impl.task.graph.cdg.AddRegionalNodesTask;
-import ru.hse.pdg4j.impl.task.graph.cdg.ControlDependenceGraphTask;
-import ru.hse.pdg4j.impl.task.graph.cdg.DeleteAdditionalNodesExportTask;
-import ru.hse.pdg4j.impl.task.graph.cdg.DeleteAdditionalNodesTask;
-import ru.hse.pdg4j.impl.task.graph.cfg.ControlDependenceGraphExportTask;
-import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
-import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
-
-import java.io.File;
-
-import ru.hse.pdg4j.impl.task.graph.dfg.DataFlowGraphTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowExportTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
+import ru.hse.pdg4j.impl.user.BootstrapContext;
+import ru.hse.pdg4j.impl.user.CommandOptions;
+import ru.hse.pdg4j.impl.user.check.AddChecksPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.check.MakeStructuresPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.entry.EntryPointPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.export.ExportPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.launcher.LauncherPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.log.LogPipelineBuilderTask;
+import ru.hse.pdg4j.impl.user.report.ReportPipelineBuilderTask;
 
 public class Main {
+    private static final ExecutionListener DIE_ON_FAILURE_LISTENER = new ExecutionListener() {
+        @Override
+        public void onException(PipelineTask<?> pipelineTask, PipelineGraphNode current, Exception e, PipelineContext context) {
+            System.err.println("Failed to setup PDG4J: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    };
+
     public static void main(String[] args) {
-        File sources = new File("src/test/sampleProject/src/main/java");
-        File exportRoot = new File("src/test/sampleProject/out");
-        String[] classpath = "src/test/sampleProject/build/dependencies/guava-24.0-jre.jar".split(";");
+        CommandOptions commandOptions = new CommandOptions();
+        new CommandLine(commandOptions).parseArgs(args);
 
-        FlowPipeline flowPipeline = new SimpleFlowPipeline("PDG4J");
-        PipelineGraphNode graph = new PipelineGraphBuilder()
-                .task(new LauncherTask(sources, classpath))
-                .task(new MethodExtractionTask())
-                .task(new ControlFlowGraphTask())
-                .task(new ControlFlowGraphExportTask(exportRoot))
-                .task(new PreprocessControlFlowTask("main"))
-                .task(new PreprocessControlFlowExportTask(exportRoot))
-                .task(new PostDominatorTreeTask("main"))
-                .task(new PostDominatorTreeExportTask(exportRoot))
-                .task(new ControlDependenceGraphTask("main"))
-                .task(new ControlDependenceGraphExportTask(exportRoot))
-                .task(new AddRegionalNodesTask("main"))
-                .task(new AddRegionalNodesGraphExportTask(exportRoot))
-                .task(new DeleteAdditionalNodesTask("main"))
-                .task(new DeleteAdditionalNodesExportTask(exportRoot))
-                .task(new DataFlowGraphTask())
-                .build();
+        BootstrapContext context = new BootstrapContext(commandOptions);
+        new SimpleFlowPipeline("Setup").run(
+                new PipelineGraphBuilder()
+                        .task(new EntryPointPipelineBuilderTask(context))
+                        .task(new LauncherPipelineBuilderTask(), "Entry")
+                        .task(new ReportPipelineBuilderTask(), "Launcher")
+                        .task(new LogPipelineBuilderTask(), "Report")
+                        .task(new ExportPipelineBuilderTask(), "Log")
+                        .task(new MakeStructuresPipelineBuilderTask(), "Export")
+                        .task(new AddChecksPipelineBuilderTask(), "Make")
+                        .build(),
+                DIE_ON_FAILURE_LISTENER);
 
-        flowPipeline.run(graph, new PipelineExecutionListener() {
-            @Override
-            public void onComplete(PipelineTask<?> pipelineTask, PipelineTaskResult result, PipelineGraphNode current) {
-                System.out.printf("%s: %s%n",
-                        pipelineTask.getName(),
-                        result.isSuccessful()
-                                ? "OK"
-                                : "FAIL: " + result.getMessage());
-            }
-
-            @Override
-            public void onException(PipelineTask<?> pipelineTask, PipelineGraphNode current, Exception e) {
-                System.out.println("Error executing " + pipelineTask.getName());
-                e.printStackTrace();
-            }
-        });
+        PipelineGraphNode mainframe = context.getBuilder().build();
+        new SimpleFlowPipeline("PDG4J").run(mainframe, context.getListener());
     }
 }

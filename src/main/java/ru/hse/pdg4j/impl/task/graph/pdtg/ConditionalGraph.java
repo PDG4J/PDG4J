@@ -3,17 +3,13 @@ package ru.hse.pdg4j.impl.task.graph.pdtg;
 import fr.inria.controlflow.BranchKind;
 import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.ControlFlowNode;
-import fr.inria.controlflow.GraphVisPrettyPrinter;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import java.util.*;
+
 public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode, ConditionalEdge> {
-    private Map<ControlFlowNode, ConditionalGraphNode> mapToConditionalNode;
+    private final Map<ControlFlowNode, ConditionalGraphNode> mapToConditionalNode;
     private String name;
 
     public ConditionalGraph() {
@@ -34,7 +30,7 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
 
     public void dfs(ControlFlowGraph graph, ControlFlowNode node, Set<ControlFlowNode> set) {
         set.add(node);
-        for (var edge: graph.outgoingEdgesOf(node)) {
+        for (var edge : graph.outgoingEdgesOf(node)) {
             this.addEdge(node, edge.getTargetNode(), edge.isBackEdge());
             if (!set.contains(edge.getTargetNode())) {
                 dfs(graph, edge.getTargetNode(), set);
@@ -84,7 +80,7 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
         }
 
         var edge = (ConditionalEdge) super.addEdge(source, target);
-        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT ) {
+        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT) {
             if (super.outDegreeOf(source) == 1) {
                 edge.setType(ConditionalEdgeType.TRUE);
             } else {
@@ -128,7 +124,7 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
         }
 
         var edge = (ConditionalEdge) super.addEdge(source, target);
-        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT ) {
+        if (source.getKind() == BranchKind.BRANCH && target.getKind() != BranchKind.STATEMENT) {
             if (super.outDegreeOf(source) == 1) {
                 edge.setType(ConditionalEdgeType.TRUE);
             } else {

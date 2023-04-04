@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JsonCheckReportExportStrategy implements CheckReportExportStrategy<String> {
-    private Gson gson;
+    private final Gson gson;
 
     public JsonCheckReportExportStrategy(Gson gson) {
         this.gson = gson;

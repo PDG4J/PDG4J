@@ -24,8 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context> {
-    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
-    }
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     @Override
     public String getName() {
@@ -78,5 +77,6 @@ public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context
         return comment;
     }
 
-    private AtomicInteger counter = new AtomicInteger(0);
+    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
+    }
 }

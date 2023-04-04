@@ -18,7 +18,7 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlFlowGraphExportTask implements PipelineTask<IdleTask.Context> {
-    private File destinationFolder;
+    private final File destinationFolder;
 
     public ControlFlowGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;

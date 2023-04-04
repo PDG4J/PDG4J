@@ -1,5 +1,7 @@
 package ru.hse.pdg4j.api;
 
+import ru.hse.pdg4j.api.check.task.CheckPipelineTask;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -42,9 +44,8 @@ public interface PipelineTask<T extends PipelineTaskContext> {
      * Failed blocking task stops the entire pipeline.
      * May work differently for checking tasks, please refer to the corresponding javadocs
      *
-     * @see ru.hse.pdg4j.api.check.task.CheckPipelineTask
-     *
      * @return whether the task is blocking
+     * @see CheckPipelineTask#isBlocking()
      */
     default boolean isBlocking() {
         return false;

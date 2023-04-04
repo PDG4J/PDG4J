@@ -1,10 +1,8 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
-import fr.inria.controlflow.ControlFlowNode;
-
 public class ConditionalEdge {
-    private ConditionalGraphNode source;
-    private ConditionalGraphNode target;
+    private final ConditionalGraphNode source;
+    private final ConditionalGraphNode target;
     private ConditionalEdgeType type;
     private boolean isBackEdge = false;
 
@@ -14,7 +12,7 @@ public class ConditionalEdge {
         this.type = type;
     }
 
-    public ConditionalEdge(ConditionalGraphNode source, ConditionalGraphNode target, ConditionalEdgeType type, boolean isBackEdge ) {
+    public ConditionalEdge(ConditionalGraphNode source, ConditionalGraphNode target, ConditionalEdgeType type, boolean isBackEdge) {
         this.source = source;
         this.target = target;
         this.type = type;

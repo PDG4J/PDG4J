@@ -1,6 +1,5 @@
 package ru.hse.pdg4j.impl.task.graph.cfg;
 
-import fr.inria.controlflow.ControlFlowGraph;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
@@ -20,8 +19,8 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.Context> {
-    private File destinationFolder;
-    private String controlDependenct = "CDG";
+    private final File destinationFolder;
+    private final String controlDependenct = "CDG";
 
     public ControlDependenceGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;

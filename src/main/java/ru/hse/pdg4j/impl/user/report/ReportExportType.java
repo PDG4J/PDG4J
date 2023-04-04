@@ -8,11 +8,11 @@ public enum ReportExportType {
     TEXT(new TextCheckReportExportStrategy()),
     JSON(new JsonCheckReportExportStrategy());
 
+    final CheckReportExportStrategy<String> strategy;
+
     ReportExportType(CheckReportExportStrategy<String> strategy) {
         this.strategy = strategy;
     }
-
-    final CheckReportExportStrategy<String> strategy;
 
     public CheckReportExportStrategy<String> getStrategy() {
         return strategy;

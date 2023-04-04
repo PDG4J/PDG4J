@@ -26,10 +26,11 @@ public class IdleTask implements PipelineTask<IdleTask.Context> {
         return success();
     }
 
-    public static class Context implements PipelineTaskContext {}
-
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return Collections.emptyList();
+    }
+
+    public static class Context implements PipelineTaskContext {
     }
 }

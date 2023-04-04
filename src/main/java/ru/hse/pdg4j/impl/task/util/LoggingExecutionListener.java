@@ -5,7 +5,7 @@ import ru.hse.pdg4j.api.*;
 import java.util.logging.Logger;
 
 public class LoggingExecutionListener implements ExecutionListener {
-    private Logger logger;
+    private final Logger logger;
 
     public LoggingExecutionListener(Logger logger) {
         this.logger = logger;

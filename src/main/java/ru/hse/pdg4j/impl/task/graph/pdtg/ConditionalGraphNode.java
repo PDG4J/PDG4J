@@ -2,33 +2,25 @@ package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
 import fr.inria.controlflow.ControlFlowEdge;
-import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.TransferFunctionVisitor;
 import fr.inria.controlflow.Value;
+import spoon.reflect.declaration.CtElement;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import spoon.reflect.declaration.CtElement;
 
 
 public class ConditionalGraphNode {
     public static int count = 0;
-    private int id;
+    private final int id;
     ConditionalGraph parent;
-    private BranchKind kind;
     CtElement statement;
     List<Value> input;
     List<Value> output;
     Object tag;
     TransferFunctionVisitor visitor;
-
-    public BranchKind getKind() {
-        return this.kind;
-    }
-
-    public void setKind(BranchKind kind) {
-        this.kind = kind;
-    }
+    private BranchKind kind;
 
     public ConditionalGraphNode(CtElement statement, ConditionalGraph parent, BranchKind kind) {
         this.kind = kind;
@@ -43,6 +35,14 @@ public class ConditionalGraphNode {
         this.parent = parent;
         ++count;
         this.id = count;
+    }
+
+    public BranchKind getKind() {
+        return this.kind;
+    }
+
+    public void setKind(BranchKind kind) {
+        this.kind = kind;
     }
 
     public void transfer(TransferFunctionVisitor visitor) {
@@ -66,12 +66,12 @@ public class ConditionalGraphNode {
         ArrayList<fr.inria.controlflow.ControlFlowNode> result = new ArrayList();
         Iterator var2 = this.prev().iterator();
 
-        while(var2.hasNext()) {
-            fr.inria.controlflow.ControlFlowNode n = (fr.inria.controlflow.ControlFlowNode)var2.next();
+        while (var2.hasNext()) {
+            fr.inria.controlflow.ControlFlowNode n = (fr.inria.controlflow.ControlFlowNode) var2.next();
             Iterator var4 = n.next().iterator();
 
-            while(var4.hasNext()) {
-                fr.inria.controlflow.ControlFlowNode nn = (fr.inria.controlflow.ControlFlowNode)var4.next();
+            while (var4.hasNext()) {
+                fr.inria.controlflow.ControlFlowNode nn = (fr.inria.controlflow.ControlFlowNode) var4.next();
                 if (!nn.equals(this)) {
                     result.add(nn);
                 }
@@ -85,8 +85,8 @@ public class ConditionalGraphNode {
         ArrayList<fr.inria.controlflow.ControlFlowNode> result = new ArrayList();
         Iterator var2 = this.parent.outgoingEdgesOf(this).iterator();
 
-        while(var2.hasNext()) {
-            ControlFlowEdge e = (ControlFlowEdge)var2.next();
+        while (var2.hasNext()) {
+            ControlFlowEdge e = (ControlFlowEdge) var2.next();
             result.add(e.getTargetNode());
         }
 
@@ -97,8 +97,8 @@ public class ConditionalGraphNode {
         ArrayList<fr.inria.controlflow.ControlFlowNode> result = new ArrayList();
         Iterator var2 = this.parent.incomingEdgesOf(this).iterator();
 
-        while(var2.hasNext()) {
-            ControlFlowEdge e = (ControlFlowEdge)var2.next();
+        while (var2.hasNext()) {
+            ControlFlowEdge e = (ControlFlowEdge) var2.next();
             result.add(e.getSourceNode());
         }
 
@@ -148,7 +148,7 @@ public class ConditionalGraphNode {
     public String toString() {
         if (this.statement != null) {
             int var10000 = this.id;
-            return var10000 + " - " + this.statement.toString();
+            return var10000 + " - " + this.statement;
         } else {
             return this.kind + "_" + this.id;
         }

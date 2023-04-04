@@ -7,8 +7,8 @@ import ru.hse.pdg4j.impl.task.util.IdleExecutionListener;
 
 public class BootstrapContext implements PipelineSharedContext {
     private final PipelineGraphBuilder builder;
-    private ExecutionListener listener;
     private final CommandOptions options;
+    private ExecutionListener listener;
 
     public BootstrapContext(CommandOptions options) {
         this.builder = new PipelineGraphBuilder();

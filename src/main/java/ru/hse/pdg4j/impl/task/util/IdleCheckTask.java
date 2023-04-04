@@ -11,11 +11,6 @@ public class IdleCheckTask extends CheckPipelineTask {
         super(name);
     }
 
-    public IdleCheckTask setBlocking(boolean blocking) {
-        this.blocking = blocking;
-        return this;
-    }
-
     public IdleCheckTask setSuccess(boolean success) {
         this.success = success;
         return this;
@@ -33,5 +28,10 @@ public class IdleCheckTask extends CheckPipelineTask {
     @Override
     public boolean isBlocking() {
         return blocking;
+    }
+
+    public IdleCheckTask setBlocking(boolean blocking) {
+        this.blocking = blocking;
+        return this;
     }
 }

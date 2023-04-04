@@ -1,9 +1,7 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
-import fr.inria.controlflow.ControlFlowEdge;
-import fr.inria.controlflow.ControlFlowGraph;
-import fr.inria.controlflow.ControlFlowNode;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -22,8 +20,8 @@ public class GraphVisPrettyPrinterForConditionalGraph {
         HashMap<ConditionalGraphNode, Integer> nodeIds = new HashMap();
         Iterator var4 = this.graph.vertexSet().iterator();
 
-        while(var4.hasNext()) {
-            ConditionalGraphNode n = (ConditionalGraphNode)var4.next();
+        while (var4.hasNext()) {
+            ConditionalGraphNode n = (ConditionalGraphNode) var4.next();
             ++i;
             this.printNode(i, n, sb);
             nodeIds.put(n, i);
@@ -31,12 +29,12 @@ public class GraphVisPrettyPrinterForConditionalGraph {
 
         var4 = this.graph.edgeSet().iterator();
 
-        while(var4.hasNext()) {
-            ConditionalEdge e = (ConditionalEdge)var4.next();
+        while (var4.hasNext()) {
+            ConditionalEdge e = (ConditionalEdge) var4.next();
             if (e.isBackEdge()) {
                 sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[style=dashed];\n ");
             } else {
-                sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[label=\"" + e.getType() + "\"]" ).append(" ;\n ");
+                sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[label=\"" + e.getType() + "\"]").append(" ;\n ");
             }
         }
 

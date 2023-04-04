@@ -1,12 +1,11 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
-import fr.inria.controlflow.ControlFlowGraph;
 import fr.inria.controlflow.ControlFlowNode;
 
 public class PostDominatorInfo {
-    private ConditionalGraph graph;
-    private ControlFlowNode start;
-    private ControlFlowNode end;
+    private final ConditionalGraph graph;
+    private final ControlFlowNode start;
+    private final ControlFlowNode end;
 
     public PostDominatorInfo(ConditionalGraph graph, ControlFlowNode start, ControlFlowNode end) {
         this.graph = graph;
@@ -15,7 +14,7 @@ public class PostDominatorInfo {
     }
 
     public ConditionalGraph getControlFlowGraph() {
-        return  this.graph;
+        return this.graph;
     }
 
     public ControlFlowNode getStart() {

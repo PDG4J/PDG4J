@@ -1,22 +1,13 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
-import fr.inria.controlflow.BranchKind;
-import fr.inria.controlflow.ControlFlowGraph;
-import fr.inria.controlflow.ControlFlowNode;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import org.jgrapht.EdgeFactory;
 
 public class PostDominatorTree {
 
-    private int counter = 0;
+    private final ConditionalGraph graph;
     public boolean isTreeCreated = false;
-    private ConditionalGraph graph;
+    private int counter = 0;
     private Map<ConditionalGraphNode, ConditionalGraphNode> parent;
     private Map<ConditionalGraphNode, Integer> semi;
     private Map<Integer, ConditionalGraphNode> vertexes;
@@ -30,7 +21,7 @@ public class PostDominatorTree {
         init();
     }
 
-    private void init () {
+    private void init() {
         counter = 0;
         semi = new LinkedHashMap<>();
         vertexes = new LinkedHashMap<>();
@@ -39,7 +30,7 @@ public class PostDominatorTree {
         dom = new LinkedHashMap<>();
         ancestor = new LinkedHashMap<>();
         label = new LinkedHashMap<>();
-        for (var v: graph.vertexSet()) {
+        for (var v : graph.vertexSet()) {
             semi.put(v, 0);
             ancestor.put(v, null);
             label.put(v, v);
@@ -53,14 +44,14 @@ public class PostDominatorTree {
 
     public List<ConditionalGraphNode> pred(ConditionalGraphNode node) {
         return this.graph.incomingEdgesOf(node).stream().map(ConditionalEdge::getSource).collect(
-            Collectors.toList());
+                Collectors.toList());
     }
 
     private void dfs(ConditionalGraphNode node) {
         semi.put(node, ++counter);
         vertexes.put(counter, node);
         var edges = graph.outgoingEdgesOf(node);
-        for (var edge: edges) {
+        for (var edge : edges) {
             var target = edge.getTarget();
             if (semi.get(target) == 0) {
                 parent.put(target, node);
@@ -78,7 +69,7 @@ public class PostDominatorTree {
     }
 
     private void Link(ConditionalGraphNode parent, ConditionalGraphNode node) {
-        ancestor.put(node,parent);
+        ancestor.put(node, parent);
     }
 
     private void Process(ConditionalGraphNode node) {
@@ -99,7 +90,7 @@ public class PostDominatorTree {
             createPostDominatorTree();
         }
         ConditionalGraph newGraph = new ConditionalGraph();
-        for (var v: graph.vertexSet()) {
+        for (var v : graph.vertexSet()) {
             if (dom.get(v) == null) {
                 continue;
             }
@@ -130,8 +121,8 @@ public class PostDominatorTree {
             }
         }).limit(n - 1).collect(Collectors.toList());
 
-        for (var w: vers) {
-            for (var v: pred(w)) {
+        for (var w : vers) {
+            for (var v : pred(w)) {
                 var node = EVAL(v);
                 if (semi.get(node) < semi.get(w)) {
                     semi.put(w, semi.get(node));
@@ -139,7 +130,7 @@ public class PostDominatorTree {
             }
             addToBucket(vertexes.get(semi.get(w)), w);
             Link(parent.get(w), w);
-            for (var v: bucket.getOrDefault(parent.get(w), new HashSet<>())) {
+            for (var v : bucket.getOrDefault(parent.get(w), new HashSet<>())) {
                 var node = EVAL(v);
                 if (semi.get(node) < semi.get(v)) {
                     dom.put(v, node);

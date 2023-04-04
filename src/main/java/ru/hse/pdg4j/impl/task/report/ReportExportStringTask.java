@@ -9,7 +9,6 @@ import ru.hse.pdg4j.impl.task.util.IdleTask;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,8 +17,8 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ReportExportStringTask implements PipelineTask<IdleTask.Context> {
-    private CheckReportExportStrategy<String> strategy;
-    private OutputStream outputStream;
+    private final CheckReportExportStrategy<String> strategy;
+    private final OutputStream outputStream;
 
     public ReportExportStringTask(CheckReportExportStrategy<String> strategy, OutputStream outputStream) {
         this.strategy = strategy;

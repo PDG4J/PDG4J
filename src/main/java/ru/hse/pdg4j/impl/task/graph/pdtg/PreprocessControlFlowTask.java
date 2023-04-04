@@ -2,30 +2,25 @@ package ru.hse.pdg4j.impl.task.graph.pdtg;
 
 import fr.inria.controlflow.BranchKind;
 import fr.inria.controlflow.ControlFlowGraph;
-import fr.inria.controlflow.ControlFlowNode;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskContext;
-import ru.hse.pdg4j.impl.task.util.IdleTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 import spoon.reflect.code.CtComment.CommentType;
 import spoon.reflect.declaration.CtMethod;
 import spoon.support.reflect.code.CtCommentImpl;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PreprocessControlFlowTask implements PipelineTask<PreprocessControlFlowTask.Context> {
-    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
-    }
-
+    private final String methodName;
     private Context context;
-
-    private String methodName;
 
     public PreprocessControlFlowTask(String methodName) {
         this.methodName = methodName;
@@ -75,5 +70,8 @@ public class PreprocessControlFlowTask implements PipelineTask<PreprocessControl
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(ControlFlowGraphTask.class);
+    }
+
+    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
 }

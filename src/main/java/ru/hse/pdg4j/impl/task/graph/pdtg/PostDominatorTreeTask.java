@@ -1,26 +1,21 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
-import fr.inria.controlflow.ControlFlowGraph;
+import ru.hse.pdg4j.api.PipelineContext;
+import ru.hse.pdg4j.api.PipelineTask;
+import ru.hse.pdg4j.api.PipelineTaskContext;
+import ru.hse.pdg4j.api.PipelineTaskResult;
+import spoon.reflect.declaration.CtMethod;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import ru.hse.pdg4j.api.PipelineContext;
-import ru.hse.pdg4j.api.PipelineTask;
-import ru.hse.pdg4j.api.PipelineTaskContext;
-import ru.hse.pdg4j.impl.task.util.IdleTask;
-import ru.hse.pdg4j.api.PipelineTaskResult;
-import spoon.reflect.declaration.CtMethod;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask.Context> {
-    public record Context(Map<CtMethod<?>, ConditionalGraph> infoMap) implements PipelineTaskContext {
-    }
-
+    private final String methodName;
     private Context context;
-
-    private String methodName;
 
     public PostDominatorTreeTask(String methodName) {
         this.methodName = methodName;
@@ -50,7 +45,7 @@ public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask
             PostDominatorTree postDominatorTreeGraph = new PostDominatorTree();
 
             var edges = conditionalGraph.edgeSet();
-            for (var edge: edges) {
+            for (var edge : edges) {
                 postDominatorTreeGraph.addEdge(edge.getTarget(), edge.getSource(), edge.getType(), edge.isBackEdge());
             }
 
@@ -66,5 +61,8 @@ public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(PreprocessControlFlowTask.class);
+    }
+
+    public record Context(Map<CtMethod<?>, ConditionalGraph> infoMap) implements PipelineTaskContext {
     }
 }

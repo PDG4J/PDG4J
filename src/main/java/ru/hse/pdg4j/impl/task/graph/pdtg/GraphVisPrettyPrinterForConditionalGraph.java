@@ -33,8 +33,11 @@ public class GraphVisPrettyPrinterForConditionalGraph {
             ConditionalEdge e = (ConditionalEdge) var4.next();
             if (e.isBackEdge()) {
                 sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[style=dashed];\n ");
-            } else {
-                sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[label=\"" + e.getType() + "\"]").append(" ;\n ");
+            } else if (e.getType() == ConditionalEdgeType.DATADEPEDENCE) {
+                sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[ label=\"" + e.getType() + "\" style=bold];\n ");
+            }
+            else {
+                sb.append(nodeIds.get(e.getSource())).append(" -> ").append(nodeIds.get(e.getTarget())).append("[label=\"" + e.getType() + "\"]" ).append(" ;\n ");
             }
         }
 

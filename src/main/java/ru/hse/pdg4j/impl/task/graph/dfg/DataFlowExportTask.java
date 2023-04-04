@@ -40,7 +40,6 @@ public class DataFlowExportTask implements PipelineTask<IdleTask.Context> {
         if (!destinationFolder.exists()) {
             destinationFolder.mkdirs();
         }
-
         var graphContext = context.getContext(DataFlowGraphTask.Context.class);
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();

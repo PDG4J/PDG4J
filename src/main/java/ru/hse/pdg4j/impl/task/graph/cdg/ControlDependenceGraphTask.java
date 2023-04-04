@@ -18,11 +18,9 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlDependenceGraphTask implements PipelineTask<ControlDependenceGraphTask.Context> {
 
-    private final String methodName;
     private ControlDependenceGraphTask.Context context;
 
-    public ControlDependenceGraphTask(String methodName) {
-        this.methodName = methodName;
+    public ControlDependenceGraphTask() {
     }
 
     @Override
@@ -43,9 +41,6 @@ public class ControlDependenceGraphTask implements PipelineTask<ControlDependenc
 
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : postDominatorContext.infoMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            if (!ctMethod.getSimpleName().equals(this.methodName)) {
-                continue;
-            }
             var info = entry.getValue();
             var graph = new ControlDependenceGraph(basicControlFlows.get(ctMethod), info);
             controlFlowGraphMap.put(ctMethod, graph.getControlDependenceGraph());

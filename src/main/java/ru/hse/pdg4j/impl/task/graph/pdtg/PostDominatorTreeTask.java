@@ -14,11 +14,9 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask.Context> {
-    private final String methodName;
     private Context context;
 
-    public PostDominatorTreeTask(String methodName) {
-        this.methodName = methodName;
+    public PostDominatorTreeTask() {
     }
 
     @Override
@@ -38,9 +36,6 @@ public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask
         var graphContext = context.getContext(PreprocessControlFlowTask.Context.class);
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            if (!ctMethod.getSimpleName().equals(this.methodName)) {
-                continue;
-            }
             ConditionalGraph conditionalGraph = entry.getValue();
             PostDominatorTree postDominatorTreeGraph = new PostDominatorTree();
 

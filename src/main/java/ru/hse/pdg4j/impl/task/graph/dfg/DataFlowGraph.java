@@ -204,9 +204,6 @@ public class DataFlowGraph {
                 var oldParentDataDependencyGraph = DatadependenceLinks.get(dataDependencyGraphParent);
                 for (var variable: tmpDatadependenceLinks.entrySet()) {
                     var variableName = variable.getKey();
-                    if (!oldParentDataDependencyGraph.containsKey(variableName)) {
-                        System.out.println("пиздец");
-                    }
                     var oldLst = oldParentDataDependencyGraph.get(variableName);
                     var lst = variable.getValue();
                     var intersect = CollectionUtils.intersection(oldLst, lst);

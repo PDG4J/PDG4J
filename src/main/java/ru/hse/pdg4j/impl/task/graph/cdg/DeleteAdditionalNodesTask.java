@@ -17,11 +17,9 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class DeleteAdditionalNodesTask implements PipelineTask<DeleteAdditionalNodesTask.Context> {
 
-    private final String methodName;
     private DeleteAdditionalNodesTask.Context context;
 
-    public DeleteAdditionalNodesTask(String methodName) {
-        this.methodName = methodName;
+    public DeleteAdditionalNodesTask() {
     }
 
     @Override
@@ -41,9 +39,6 @@ public class DeleteAdditionalNodesTask implements PipelineTask<DeleteAdditionalN
 
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : controlDependenceContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            if (!ctMethod.getSimpleName().equals(this.methodName)) {
-                continue;
-            }
             var info = entry.getValue();
             var graph = new ConditionalGraph();
 

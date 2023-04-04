@@ -18,6 +18,9 @@ import ru.hse.pdg4j.impl.user.log.LogPipelineBuilderTask;
 import ru.hse.pdg4j.impl.user.report.ReportPipelineBuilderTask;
 
 public class Main {
+    // Built-in listener to fail the process instantly on any errors
+    // used only in the pipeline that sets up all the parameters
+    // for the main code analysis pipeline
     private static final ExecutionListener DIE_ON_FAILURE_LISTENER = new ExecutionListener() {
         @Override
         public void onException(PipelineTask<?> pipelineTask, PipelineGraphNode current, Exception e, PipelineContext context) {

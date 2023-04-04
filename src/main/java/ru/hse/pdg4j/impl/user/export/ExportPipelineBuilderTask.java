@@ -3,11 +3,11 @@ package ru.hse.pdg4j.impl.user.export;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTaskResult;
 import ru.hse.pdg4j.api.check.task.NonContextualPipelineTask;
+import ru.hse.pdg4j.api.user.BootstrapContext;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlDependenceGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphExportTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
-import ru.hse.pdg4j.impl.user.BootstrapContext;
 
 import java.io.File;
 
@@ -21,7 +21,7 @@ public class ExportPipelineBuilderTask extends NonContextualPipelineTask {
     @Override
     public PipelineTaskResult run(PipelineContext context) {
         BootstrapContext bootstrapContext = context.getSharedContext(BootstrapContext.class);
-        PipelineGraphBuilder builder = bootstrapContext.getBuilder();
+        PipelineGraphBuilder builder = bootstrapContext.getAnalysisGraphBuilder();
 
         ExportOptions.Export exportOptions = bootstrapContext.getOptions().getExportOptions().getExport();
         if (exportOptions != null) {

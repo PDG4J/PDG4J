@@ -24,7 +24,7 @@ public class ReportOptions {
         @CommandLine.Option(names = "-rt", defaultValue = "TEXT", description = "Format in which the report is printed", required = true)
         private ReportExportType exportType;
 
-        @CommandLine.Option(names = "-rf", defaultValue = "report.json",
+        @CommandLine.Option(names = "-rf", defaultValue = "report",
                 description = "Specify the file in which the report is written." +
                         " If not specified, the output is printed to stdout instead",
                 required = true)

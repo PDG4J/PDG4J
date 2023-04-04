@@ -26,7 +26,7 @@ public class SimpleFlowPipeline implements FlowPipeline {
         }
 
         Queue<PipelineGraphNode> nodes = new ArrayDeque<>();
-        Set<PipelineTask<?>> executed = new HashSet<>();
+        Set<PipelineTask<?>> executed = new LinkedHashSet<>();
         nodes.add(root);
 
         final AtomicReference<PipelineGraphNode> current = new AtomicReference<>(null);
@@ -58,9 +58,12 @@ public class SimpleFlowPipeline implements FlowPipeline {
             try {
                 for (Class<? extends PipelineTask<?>> requirement : task.getRequirements()) {
                     if (context.getTask(requirement) == null) {
-                        throw new IllegalStateException(
-                                "Requirement for task %s is not satisfied. Expected: %s"
-                                        .formatted(task.getName(), requirement.getName()));
+                        String name = executed.stream()
+                                .filter(it -> it.getClass().isAssignableFrom(requirement))
+                                .findAny()
+                                .map(PipelineTask::getName)
+                                .orElse(requirement.getName());
+                        throw new IllegalStateException("skipped because the dependency is not executed: " + name);
                     }
                 }
                 PipelineTaskResult result = task.run(context);
@@ -75,10 +78,12 @@ public class SimpleFlowPipeline implements FlowPipeline {
                 }
             } catch (Exception e) {
                 listener.onException(task, current.get(), e, context);
-                if (task instanceof CheckPipelineTask) {
-                    checksBlocked = true;
-                } else {
-                    break;
+                if (task.isBlocking()) {
+                    if (task instanceof CheckPipelineTask) {
+                        checksBlocked = true;
+                    } else {
+                        break;
+                    }
                 }
             } finally {
                 executed.add(task);

@@ -1,13 +1,17 @@
 package ru.hse.pdg4j;
 
+import org.pf4j.DefaultPluginManager;
+import org.pf4j.PluginManager;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import ru.hse.pdg4j.api.ExecutionListener;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineGraphNode;
 import ru.hse.pdg4j.api.PipelineTask;
+import ru.hse.pdg4j.api.plugin.Pdg4jExtension;
+import ru.hse.pdg4j.api.user.BootstrapContext;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
-import ru.hse.pdg4j.impl.user.BootstrapContext;
 import ru.hse.pdg4j.impl.user.CommandOptions;
 import ru.hse.pdg4j.impl.user.check.AddChecksPipelineBuilderTask;
 import ru.hse.pdg4j.impl.user.check.MakeStructuresPipelineBuilderTask;
@@ -16,6 +20,9 @@ import ru.hse.pdg4j.impl.user.export.ExportPipelineBuilderTask;
 import ru.hse.pdg4j.impl.user.launcher.LauncherPipelineBuilderTask;
 import ru.hse.pdg4j.impl.user.log.LogPipelineBuilderTask;
 import ru.hse.pdg4j.impl.user.report.ReportPipelineBuilderTask;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     // Built-in listener to fail the process instantly on any errors
@@ -31,23 +38,61 @@ public class Main {
     };
 
     public static void main(String[] args) {
+        PluginManager pluginManager = new DefaultPluginManager();
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        List<Pdg4jExtension> extensions = pluginManager.getExtensions(Pdg4jExtension.class);
+
         CommandOptions commandOptions = new CommandOptions();
-        new CommandLine(commandOptions).parseArgs(args);
+        CommandLine commandLine = new CommandLine(commandOptions);
+        // Adding all the custom options
+        for (Pdg4jExtension extension : extensions) {
+            Object options = extension.getCustomOptions();
+            if (options != null) {
+                commandLine.addMixin(extension.getName(), options);
+            }
+        }
+        // Parsing prompted args
+        try {
+            commandLine.parseArgs(args);
+        } catch (CommandLine.ParameterException e) {
+            System.err.println("Invalid usage: " + e.getMessage());
+            System.exit(-1);
+        }
 
-        BootstrapContext context = new BootstrapContext(commandOptions);
-        new SimpleFlowPipeline("Setup").run(
-                new PipelineGraphBuilder()
-                        .task(new EntryPointPipelineBuilderTask(context))
-                        .task(new LauncherPipelineBuilderTask(), "Entry")
-                        .task(new ReportPipelineBuilderTask(), "Launcher")
-                        .task(new LogPipelineBuilderTask(), "Report")
-                        .task(new ExportPipelineBuilderTask(), "Log")
-                        .task(new MakeStructuresPipelineBuilderTask(), "Export")
-                        .task(new AddChecksPipelineBuilderTask(), "Make")
-                        .build(),
-                DIE_ON_FAILURE_LISTENER);
+        BootstrapContext context = new BootstrapContext(commandOptions, commandLine);
+        PipelineGraphBuilder setupGraphBuilder = new PipelineGraphBuilder()
+                .task(new EntryPointPipelineBuilderTask(context))
+                .task(new LauncherPipelineBuilderTask(), "Entry")
+                .task(new ReportPipelineBuilderTask(), "Launcher")
+                .task(new LogPipelineBuilderTask(), "Report")
+                .task(new ExportPipelineBuilderTask(), "Log")
+                .task(new MakeStructuresPipelineBuilderTask(), "Export")
+                .task(new AddChecksPipelineBuilderTask(), "Make");
+        // Extend setup builder
+        for (Pdg4jExtension extension : extensions) {
+            extension.extendSetupPipeline(setupGraphBuilder, context);
+        }
 
-        PipelineGraphNode mainframe = context.getBuilder().build();
-        new SimpleFlowPipeline("PDG4J").run(mainframe, context.getListener());
+        new SimpleFlowPipeline("Setup")
+                .run(setupGraphBuilder.build(), DIE_ON_FAILURE_LISTENER);
+
+        PipelineGraphBuilder analysisGraphBuilder = context.getAnalysisGraphBuilder();
+        // Extend analysis builder
+        for (Pdg4jExtension extension : extensions) {
+            extension.extendAnalysisPipeline(analysisGraphBuilder, context);
+        }
+
+        LoggerFactory.getLogger("Plugins")
+                .info("Using {} plugin(-s) {}",
+                        extensions.size(),
+                        extensions.isEmpty() ?
+                                "" :
+                                ": " + extensions.stream()
+                                        .map(Pdg4jExtension::getName)
+                                        .collect(Collectors.joining(", ")));
+
+        new SimpleFlowPipeline("PDG4J")
+                .run(analysisGraphBuilder.build(), context.getAnalysisExecutionListener());
     }
 }

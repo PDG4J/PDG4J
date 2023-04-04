@@ -39,7 +39,7 @@ public class MethodExtractionTask implements PipelineTask<MethodExtractionTask.C
 
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
-        return List.of(LauncherTask.class);
+        return List.of(SourceInitialCheckTask.class);
     }
 
     public record Context(List<CtMethod<?>> methods) implements PipelineTaskContext {

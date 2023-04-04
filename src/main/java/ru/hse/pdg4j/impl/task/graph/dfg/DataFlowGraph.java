@@ -20,8 +20,12 @@ import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalEdgeType;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraphNode;
 import spoon.reflect.code.CtComment;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.factory.FactoryImpl;
 import spoon.reflect.reference.CtVariableReference;
+import spoon.support.DefaultCoreFactory;
+import spoon.support.StandardEnvironment;
 import spoon.support.reflect.code.CtAssignmentImpl;
 import spoon.support.reflect.code.CtCommentImpl;
 import spoon.support.reflect.code.CtContinueImpl;
@@ -36,9 +40,7 @@ public class DataFlowGraph {
 
     private Map<ConditionalGraphNode, ConditionalGraphNode> tmpNodesMap;
 
-    private Map<ConditionalGraphNode, Map<String, List<ConditionalGraphNode>>> DatadependenceStartSet;
-
-    private Map<ConditionalGraphNode, Map<String, List<ConditionalGraphNode>>> DatadependenceReturnSet;
+    private Map<ConditionalGraphNode, Map<String, List<ConditionalGraphNode>>> DatadependenceLinks;
 
     private Set<ConditionalGraphNode> tmpNodes;
 
@@ -57,8 +59,7 @@ public class DataFlowGraph {
         tmpNodesMap = new HashMap<>();
         tmpNodes = new HashSet<>();
         loopNodes = new HashSet<>();
-        DatadependenceReturnSet = new HashMap<>();
-        DatadependenceStartSet = new HashMap<>();
+        DatadependenceLinks = new HashMap<>();
     }
 
     private boolean isIfhasallContinue(ConditionalGraphNode node, ConditionalGraph newGraph) {
@@ -94,6 +95,7 @@ public class DataFlowGraph {
         return ans;
     }
 
+    /*
     private void findBlocks(ConditionalGraphNode node, Stack<ConditionalGraphNode> stack,
         ConditionalGraph newGraph, ConditionalGraphNode parent,
         Map<String, List<ConditionalGraphNode>> start,
@@ -281,6 +283,168 @@ public class DataFlowGraph {
         }
 
     }
+    */
+
+    private Map<String, List<ConditionalGraphNode>> deleteLocalVariables (Map<String, List<ConditionalGraphNode>> a, Map<String, List<ConditionalGraphNode>> b) {
+        Map<String, List<ConditionalGraphNode>> ans = new HashMap<>();
+        for (var variable: b.entrySet()) {
+            var variableName = variable.getKey();
+            if (a.containsKey(variableName)) {
+                var lst = new ArrayList<>(variable.getValue());
+                ans.put(variableName, lst);
+            }
+        }
+        return ans;
+    }
+
+    private void processBlocks(ConditionalGraphNode node, ConditionalGraphNode parent, Map<String, List<ConditionalGraphNode>> variablesLinks, ConditionalGraph newGraph, Stack<ConditionalGraphNode> stack, List<Pair<ConditionalGraphNode, ConditionalGraphNode>> newPairs) {
+        if (node.getKind() == BranchKind.BRANCH) {
+            stack.add(node);
+        } else if (node.getKind() == BranchKind.STATEMENT) {
+            var controlFlowGraph = new ControlFlowGraph();
+            controlFlowGraph.getEdgeFactory();
+            var beginNode = new ControlFlowNode(newCommend(node.getStatement()), controlFlowGraph, BranchKind.BEGIN);
+            var newNode = new ControlFlowNode(node.getStatement(), controlFlowGraph,
+                BranchKind.STATEMENT);
+            var endNode = new ControlFlowNode(newCommend(node.getStatement()),
+                controlFlowGraph, BranchKind.EXIT);
+            controlFlowGraph.addEdge(beginNode, newNode);
+            controlFlowGraph.addEdge(newNode, endNode);
+
+            InitializedVariables newVariables = new InitializedVariables();
+            newVariables.setIncludeDefinedInNode(false);
+
+            newVariables.run(controlFlowGraph.getExitNode());
+
+            var used = newVariables.getUsed();
+            var defined = CollectionUtils.subtract(newVariables.getDefined(), used);
+
+            System.out.println(node + " " + defined + " " + used);
+
+            for (var variable : used) {
+                if (isExported(variable)) {
+                    continue;
+                }
+                var variableName = variable.getSimpleName();
+                if (variablesLinks.containsKey(variableName)) {
+                    for (var oldVar: variablesLinks.get(variableName)) {
+                        newPairs.add(new Pair<>(oldVar, node));
+                    }
+                }
+            }
+
+            for (var variable : defined) {
+                if (isExported(variable)) {
+                    continue;
+                }
+                var variableName = variable.getSimpleName();
+                if (variablesLinks.containsKey(variableName)) {
+                    for (var oldVar: variablesLinks.get(variableName)) {
+                        newPairs.add(new Pair<>(oldVar, node));
+                    }
+                }
+                var lst = new ArrayList<ConditionalGraphNode>();
+                lst.add(node);
+                variablesLinks.put(variableName, lst);
+            }
+        }
+
+        if (!loopNodes.contains(parent) && node.getKind() == BranchKind.CONVERGE) {
+            var count = nodes.get(node);
+            count--;
+            nodes.put(node, count);
+
+            if (!DatadependenceLinks.containsKey(node)) {
+                DatadependenceLinks.put(node, new HashMap<>());
+            }
+
+            var tmpDatadependenceLinks = DatadependenceLinks.get(node);
+
+            for (var variable: variablesLinks.entrySet()) {
+                var variableName = variable.getKey();
+                if (!tmpDatadependenceLinks.containsKey(variableName)) {
+                    tmpDatadependenceLinks.put(variableName, new ArrayList<>());
+                }
+                var oldLst = tmpDatadependenceLinks.get(variableName);
+                var lst = variable.getValue();
+                var intersect = CollectionUtils.intersection(oldLst, lst);
+                oldLst.addAll(CollectionUtils.subtract(lst, intersect));
+                tmpDatadependenceLinks.put(variableName, oldLst);
+            }
+
+            DatadependenceLinks.put(node, tmpDatadependenceLinks);
+
+            if (count != 0) {
+                return;
+            }
+
+
+            if (tmpNodes.contains(node)) {
+                if (isIfhasallContinue(node, newGraph)) {
+                    var oldNode = stack.pop();
+                    tmpDatadependenceLinks = deleteLocalVariables(DatadependenceLinks.get(oldNode), tmpDatadependenceLinks);
+                }
+            }
+
+            var dataDependencyGraphParent = stack.pop();
+            tmpDatadependenceLinks = deleteLocalVariables(DatadependenceLinks.get(dataDependencyGraphParent), tmpDatadependenceLinks);
+            newPairs.add(new Pair<>(dataDependencyGraphParent, node));
+
+            if (loopNodes.contains(dataDependencyGraphParent)) {
+                var oldParentDataDependencyGraph = DatadependenceLinks.get(dataDependencyGraphParent);
+                for (var variable: tmpDatadependenceLinks.entrySet()) {
+                    var variableName = variable.getKey();
+                    if (!oldParentDataDependencyGraph.containsKey(variableName)) {
+                        System.out.println("пиздец");
+                    }
+                    var oldLst = oldParentDataDependencyGraph.get(variableName);
+                    var lst = variable.getValue();
+                    var intersect = CollectionUtils.intersection(oldLst, lst);
+                    oldLst.addAll(CollectionUtils.subtract(lst, intersect));
+                    oldParentDataDependencyGraph.put(variableName, oldLst);
+                }
+                DatadependenceLinks.put(dataDependencyGraphParent, oldParentDataDependencyGraph);
+            } else {
+                DatadependenceLinks.put(node, tmpDatadependenceLinks);
+            }
+
+        } else {
+            DatadependenceLinks.put(node, variablesLinks);
+        }
+
+        used.add(node);
+
+        for (var edge: newGraph.outgoingEdgesOf(node)) {
+            var target = edge.getTarget();
+            if (!used.contains(target)) {
+                if (loopNodes.contains(node)) {
+                    if (target.getKind() == BranchKind.CONVERGE) {
+                        processBlocks(target, node, DatadependenceLinks.get(node), newGraph, stack, newPairs);
+                    } else {
+                        var newMap = new HashMap<String, List<ConditionalGraphNode>>();
+                        for (var variable: variablesLinks.entrySet()) {
+                            var lst = new ArrayList<>(variable.getValue());
+                            newMap.put(variable.getKey(), lst);
+                        }
+                        processBlocks(target, node, newMap, newGraph, stack, newPairs);
+                    }
+                } else if (node.getKind() == BranchKind.BRANCH) {
+                    if (target.getKind() == BranchKind.CONVERGE) {
+                        processBlocks(target, node, variablesLinks, newGraph, stack, newPairs);
+                    } else {
+                        var newMap = new HashMap<String, List<ConditionalGraphNode>>();
+                        for (var variable: variablesLinks.entrySet()) {
+                            var lst = new ArrayList<>(variable.getValue());
+                            newMap.put(variable.getKey(), lst);
+                        }
+                        processBlocks(target, node, newMap, newGraph, stack, newPairs);
+                    }
+                } else {
+                    processBlocks(target, node, DatadependenceLinks.get(node), newGraph, stack, newPairs);
+                }
+            }
+        }
+    }
 
     private void basicDfs(ConditionalGraphNode node, ConditionalGraph newGraph) {
         used.add(node);
@@ -292,7 +456,7 @@ public class DataFlowGraph {
                 loopNodes.add(target);
 
                 if (!tmpNodesMap.containsKey(target)) {
-                    var comment = newCommend(node.getStatement().getFactory());
+                    var comment = newCommend(node.getStatement());
                     var newNode = new ConditionalGraphNode(comment, newGraph, BranchKind.CONVERGE);
                     newGraph.addVertex(newNode);
                     newGraph.addEdge(newNode, target, ConditionalEdgeType.NONE, true);
@@ -331,8 +495,8 @@ public class DataFlowGraph {
         used = new HashSet<>();
         var stack = new Stack<ConditionalGraphNode>();
         var newEdges = new ArrayList<Pair<ConditionalGraphNode, ConditionalGraphNode>>();
-        findBlocks(newGraph.getStart(), stack, newGraph, null,
-            new HashMap<>(), new HashMap<>(), newEdges);
+        var variablesLinks = new HashMap<String, List<ConditionalGraphNode>>();
+        processBlocks(newGraph.getStart(), null, variablesLinks, newGraph, stack, newEdges);
         newEdges.forEach(
             (Pair<ConditionalGraphNode, ConditionalGraphNode> pair) -> newGraph.addEdge(pair.first,
                 pair.second,
@@ -340,8 +504,15 @@ public class DataFlowGraph {
         return newGraph;
     }
 
-    private CtCommentImpl newCommend(Factory factory) {
+    private CtCommentImpl newCommend(CtElement statement) {
+        Factory factory;
+        if (statement == null) {
+            factory = new FactoryImpl(new DefaultCoreFactory(), new StandardEnvironment());
+        } else {
+            factory = statement.getFactory();
+        }
         var comment = new CtCommentImpl();
+        comment.getFactory().getEnvironment();
         comment.setContent("R" + (counter.getAndIncrement()));
         comment.setCommentType(CtComment.CommentType.BLOCK);
         comment.setFactory(factory);

@@ -48,6 +48,7 @@ public class Main {
         System.out.println("123");
     }
 
+
     public static void main(String[] args) {
         int a;
         int  b = 10;
@@ -140,6 +141,10 @@ public class Main {
             }
             System.out.println(12333);
             b += 10;
+        }
+
+        while (a < 100) {
+            System.out.println(1233);
         }
     }
 }

@@ -27,12 +27,11 @@ public class MakeStructuresPipelineBuilderTask extends NonContextualPipelineTask
         PipelineGraphBuilder builder = bootstrapContext.getAnalysisGraphBuilder();
         builder.task(new MethodExtractionTask())
                 .task(new ControlFlowGraphTask())
-                // TODO: figure out why 'methodName' is even there
-                .task(new PreprocessControlFlowTask("main"))
-                .task(new PostDominatorTreeTask("main"))
-                .task(new ControlDependenceGraphTask("main"))
-                .task(new AddRegionalNodesTask("main"))
-                .task(new DeleteAdditionalNodesTask("main"))
+                .task(new PreprocessControlFlowTask())
+                .task(new PostDominatorTreeTask())
+                .task(new ControlDependenceGraphTask())
+                .task(new AddRegionalNodesTask())
+                .task(new DeleteAdditionalNodesTask())
                 .task(new DataFlowGraphTask());
         return success();
     }

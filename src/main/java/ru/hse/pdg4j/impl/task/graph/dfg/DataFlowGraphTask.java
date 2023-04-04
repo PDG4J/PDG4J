@@ -30,11 +30,8 @@ public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context
     public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
 
-    public DataFlowGraphTask(String methodName) {
-        this.methodName = methodName;
+    public DataFlowGraphTask() {
     }
-
-    private String methodName;
 
     @Override
     public String getName() {
@@ -54,9 +51,6 @@ public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context
 
         var graph = context.getContext(PreprocessControlFlowTask.Context.class).graphMap();
         graph.forEach((ctMethod, condtionalGraph) -> {
-            if (!ctMethod.getSimpleName().equals(methodName)) {
-                return;
-            }
             var newGraph = new DataFlowGraph(condtionalGraph);
 
             graphMap.put(ctMethod, newGraph.getControlDependenceGraph());
@@ -71,14 +65,4 @@ public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context
         return List.of(PreprocessControlFlowTask.class);
     }
 
-    private CtCommentImpl makeComment(Factory factory) {
-        var comment = new CtCommentImpl();
-        comment.setContent("R" + (counter.getAndIncrement()));
-        comment.setCommentType(CtComment.CommentType.BLOCK);
-        comment.setFactory(factory);
-        return comment;
-    }
-
-    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
-    }
 }

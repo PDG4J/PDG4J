@@ -16,11 +16,9 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class AddRegionalNodesTask implements PipelineTask<AddRegionalNodesTask.Context> {
 
-    private final String methodName;
     private AddRegionalNodesTask.Context context;
 
-    public AddRegionalNodesTask(String methodName) {
-        this.methodName = methodName;
+    public AddRegionalNodesTask() {
     }
 
     @Override
@@ -40,9 +38,6 @@ public class AddRegionalNodesTask implements PipelineTask<AddRegionalNodesTask.C
 
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : controlDependenceContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            if (!ctMethod.getSimpleName().equals(this.methodName)) {
-                continue;
-            }
             var info = entry.getValue();
 
             var graph = new AddRegionalNodesGraph(info);

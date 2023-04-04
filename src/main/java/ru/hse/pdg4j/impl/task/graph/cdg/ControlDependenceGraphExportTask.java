@@ -1,4 +1,4 @@
-package ru.hse.pdg4j.impl.task.graph.cfg;
+package ru.hse.pdg4j.impl.task.graph.cdg;
 
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;

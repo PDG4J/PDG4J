@@ -19,11 +19,9 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PreprocessControlFlowTask implements PipelineTask<PreprocessControlFlowTask.Context> {
-    private final String methodName;
     private Context context;
 
-    public PreprocessControlFlowTask(String methodName) {
-        this.methodName = methodName;
+    public PreprocessControlFlowTask() {
     }
 
     @Override
@@ -43,9 +41,6 @@ public class PreprocessControlFlowTask implements PipelineTask<PreprocessControl
         var graphContext = context.getContext(ControlFlowGraphTask.Context.class);
         for (Map.Entry<CtMethod<?>, ControlFlowGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
-            if (!ctMethod.getSimpleName().equals(this.methodName)) {
-                continue;
-            }
             ControlFlowGraph controlFlowGraph = entry.getValue();
             ConditionalGraph graph = new ConditionalGraph();
 

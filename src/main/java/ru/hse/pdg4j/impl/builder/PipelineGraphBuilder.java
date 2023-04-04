@@ -2,7 +2,6 @@ package ru.hse.pdg4j.impl.builder;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import ru.hse.pdg4j.api.PipelineGraphNode;
 import ru.hse.pdg4j.api.PipelineTask;
 
@@ -10,37 +9,9 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class PipelineGraphBuilder {
-    private Map<String, List<String>> graph;
-    private Map<String, PipelineTask<?>> nodeNames;
-    private Multimap<Class<? extends PipelineTask>, PipelineTask<?>> taskMap;
-
-    private class SimplePipelineGraphNode implements PipelineGraphNode {
-        private PipelineTask<?> task;
-        private List<PipelineGraphNode> children;
-
-        public SimplePipelineGraphNode(PipelineTask<?> task) {
-            this.task = task;
-            this.children = new ArrayList<>();
-        }
-
-        @Override
-        public PipelineTask<?> getTask() {
-            return task;
-        }
-
-        @Override
-        public Collection<PipelineGraphNode> getChildren() {
-            return children;
-        }
-
-        public void setChildren(List<PipelineGraphNode> children) {
-            this.children = children;
-        }
-
-        public void addChild(PipelineGraphNode child) {
-            children.add(child);
-        }
-    }
+    private final Map<String, List<String>> graph;
+    private final Map<String, PipelineTask<?>> nodeNames;
+    private final Multimap<Class<? extends PipelineTask>, PipelineTask<?>> taskMap;
 
     public PipelineGraphBuilder() {
         this.graph = new HashMap<>();
@@ -147,5 +118,33 @@ public class PipelineGraphBuilder {
             visited.add(adjacent);
         }
         order.add(name);
+    }
+
+    private class SimplePipelineGraphNode implements PipelineGraphNode {
+        private PipelineTask<?> task;
+        private List<PipelineGraphNode> children;
+
+        public SimplePipelineGraphNode(PipelineTask<?> task) {
+            this.task = task;
+            this.children = new ArrayList<>();
+        }
+
+        @Override
+        public PipelineTask<?> getTask() {
+            return task;
+        }
+
+        @Override
+        public Collection<PipelineGraphNode> getChildren() {
+            return children;
+        }
+
+        public void setChildren(List<PipelineGraphNode> children) {
+            this.children = children;
+        }
+
+        public void addChild(PipelineGraphNode child) {
+            children.add(child);
+        }
     }
 }

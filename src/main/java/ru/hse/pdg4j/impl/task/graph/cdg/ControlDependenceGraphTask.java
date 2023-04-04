@@ -1,32 +1,25 @@
 package ru.hse.pdg4j.impl.task.graph.cdg;
 
-import fr.inria.controlflow.ControlFlowGraph;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
-import ru.hse.pdg4j.impl.task.util.IdleTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorInfo;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
-import spoon.reflect.declaration.CtMethod;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskContext;
 import ru.hse.pdg4j.api.PipelineTaskResult;
+import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
+import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
+import spoon.reflect.declaration.CtMethod;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlDependenceGraphTask implements PipelineTask<ControlDependenceGraphTask.Context> {
 
-    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
-    }
-
+    private final String methodName;
     private ControlDependenceGraphTask.Context context;
-
-    private String methodName;
 
     public ControlDependenceGraphTask(String methodName) {
         this.methodName = methodName;
@@ -65,5 +58,8 @@ public class ControlDependenceGraphTask implements PipelineTask<ControlDependenc
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(PostDominatorTreeTask.class);
+    }
+
+    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
 }

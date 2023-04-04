@@ -1,7 +1,10 @@
 package ru.hse.pdg4j;
 
 import picocli.CommandLine;
-import ru.hse.pdg4j.api.*;
+import ru.hse.pdg4j.api.ExecutionListener;
+import ru.hse.pdg4j.api.PipelineContext;
+import ru.hse.pdg4j.api.PipelineGraphNode;
+import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
 import ru.hse.pdg4j.impl.user.BootstrapContext;

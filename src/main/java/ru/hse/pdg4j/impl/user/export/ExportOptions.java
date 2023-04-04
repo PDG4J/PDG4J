@@ -9,6 +9,10 @@ public class ExportOptions {
     @CommandLine.ArgGroup(exclusive = false)
     private Export export;
 
+    public Export getExport() {
+        return export;
+    }
+
     static class Export {
         @CommandLine.Option(names = "-ex", description = "A set of structures to export", required = true)
         private Set<ExportType> exportTypeSet;
@@ -23,9 +27,5 @@ public class ExportOptions {
         public String getExportRoot() {
             return exportRoot;
         }
-    }
-
-    public Export getExport() {
-        return export;
     }
 }

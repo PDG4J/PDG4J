@@ -1,30 +1,20 @@
 package ru.hse.pdg4j.impl.task.graph.cdg;
 
 import fr.inria.controlflow.BranchKind;
-import fr.inria.controlflow.ControlFlowEdge;
-import fr.inria.controlflow.ControlFlowGraph;
-import fr.inria.controlflow.ControlFlowNode;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalEdge;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraphNode;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorInfo;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import spoon.reflect.code.CtComment.CommentType;
-import spoon.reflect.path.impl.CtRolePathElement;
-import spoon.support.reflect.code.CtCommentImpl;
 
-public class ControlDependenceGraph  {
-    private ConditionalGraph info;
-    private ConditionalGraph baseControlFlowGraph;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class ControlDependenceGraph {
+    private final ConditionalGraph info;
+    private final ConditionalGraph baseControlFlowGraph;
+    private final Integer nodeCounter = 0;
     private int counter = 0;
-    private Integer nodeCounter = 0;
     private Set<ConditionalGraphNode> used;
     private Map<ConditionalGraphNode, Integer> in, out;
     private Map<ConditionalGraphNode, ConditionalGraphNode> parent;
@@ -36,7 +26,7 @@ public class ControlDependenceGraph  {
         init();
     }
 
-    private void init () {
+    private void init() {
         this.counter = 0;
         used = new HashSet<>();
         in = new LinkedHashMap<>();
@@ -49,7 +39,7 @@ public class ControlDependenceGraph  {
 
         ConditionalGraph newGraph = new ConditionalGraph();
         dfs(info.getStart());
-        for (var edge: baseControlFlowGraph.edgeSet()) {
+        for (var edge : baseControlFlowGraph.edgeSet()) {
             process(edge, newGraph);
         }
         return newGraph;
@@ -58,7 +48,7 @@ public class ControlDependenceGraph  {
     private void dfs(ConditionalGraphNode node) {
         used.add(node);
         in.put(node, ++counter);
-        for (var edge: info.outgoingEdgesOf(node)) {
+        for (var edge : info.outgoingEdgesOf(node)) {
             if (!used.contains(edge.getTarget())) {
                 dfs(edge.getTarget());
             }

@@ -6,6 +6,17 @@ public class ReportOptions {
     @CommandLine.ArgGroup(exclusive = false)
     private Report report;
 
+    public Report getReport() {
+        return report;
+    }
+
+    @Override
+    public String toString() {
+        return "ReportOptions{" +
+                "report=" + report +
+                '}';
+    }
+
     static class Report {
         @CommandLine.Option(names = "-r", fallbackValue = "true", description = "Whether to output a report or not", required = true)
         private boolean writeReport;
@@ -39,16 +50,5 @@ public class ReportOptions {
                     ", reportFile='" + reportFile + '\'' +
                     '}';
         }
-    }
-
-    public Report getReport() {
-        return report;
-    }
-
-    @Override
-    public String toString() {
-        return "ReportOptions{" +
-                "report=" + report +
-                '}';
     }
 }

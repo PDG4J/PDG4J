@@ -1,14 +1,5 @@
 package ru.hse.pdg4j.impl.task.graph.cdg;
 
-import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
-import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
@@ -16,9 +7,19 @@ import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import spoon.reflect.declaration.CtMethod;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
+import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
+
 public class DeleteAdditionalNodesExportTask implements PipelineTask<IdleTask.Context> {
-    private File destinationFolder;
-    private String controlDependenct = "CDG+R-AN";
+    private final File destinationFolder;
+    private final String controlDependenct = "CDG+R-AN";
 
     public DeleteAdditionalNodesExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;

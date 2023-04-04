@@ -1,6 +1,5 @@
 package ru.hse.pdg4j.impl.task.graph.pdtg;
 
-import fr.inria.controlflow.ControlFlowGraph;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
@@ -18,8 +17,8 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PreprocessControlFlowExportTask implements PipelineTask<IdleTask.Context> {
-    private File destinationFolder;
-    private static String pdtg = "PCFG";
+    private static final String pdtg = "PCFG";
+    private final File destinationFolder;
 
     public PreprocessControlFlowExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
@@ -46,7 +45,7 @@ public class PreprocessControlFlowExportTask implements PipelineTask<IdleTask.Co
             CtMethod<?> ctMethod = entry.getKey();
 
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, this.pdtg + ctMethod.getSignature());
+            File destination = new File(destinationFolder, pdtg + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

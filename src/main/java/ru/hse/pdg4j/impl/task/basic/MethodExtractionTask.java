@@ -14,9 +14,6 @@ import java.util.List;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class MethodExtractionTask implements PipelineTask<MethodExtractionTask.Context> {
-    public record Context(List<CtMethod<?>> methods) implements PipelineTaskContext {
-    }
-
     private Context context;
 
     @Override
@@ -43,5 +40,8 @@ public class MethodExtractionTask implements PipelineTask<MethodExtractionTask.C
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(LauncherTask.class);
+    }
+
+    public record Context(List<CtMethod<?>> methods) implements PipelineTaskContext {
     }
 }

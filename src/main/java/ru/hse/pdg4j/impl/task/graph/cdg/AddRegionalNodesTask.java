@@ -1,28 +1,23 @@
 package ru.hse.pdg4j.impl.task.graph.cdg;
 
-import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskContext;
 import ru.hse.pdg4j.api.PipelineTaskResult;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
-import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
 import spoon.reflect.declaration.CtMethod;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class AddRegionalNodesTask implements PipelineTask<AddRegionalNodesTask.Context> {
 
-    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
-    }
-
+    private final String methodName;
     private AddRegionalNodesTask.Context context;
-
-    private String methodName;
 
     public AddRegionalNodesTask(String methodName) {
         this.methodName = methodName;
@@ -53,7 +48,6 @@ public class AddRegionalNodesTask implements PipelineTask<AddRegionalNodesTask.C
             var graph = new AddRegionalNodesGraph(info);
 
 
-
             controlFlowGraphMap.put(ctMethod, graph.getControlDependenceGraph());
         }
         this.context = new AddRegionalNodesTask.Context(controlFlowGraphMap);
@@ -64,5 +58,8 @@ public class AddRegionalNodesTask implements PipelineTask<AddRegionalNodesTask.C
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(ControlDependenceGraphTask.class);
+    }
+
+    public record Context(Map<CtMethod<?>, ConditionalGraph> graphMap) implements PipelineTaskContext {
     }
 }

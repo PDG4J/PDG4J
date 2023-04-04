@@ -8,7 +8,7 @@ import ru.hse.pdg4j.impl.user.BootstrapContext;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class EntryPointPipelineBuilderTask extends NonContextualPipelineTask {
-    private BootstrapContext context;
+    private final BootstrapContext context;
 
     public EntryPointPipelineBuilderTask(BootstrapContext context) {
         super("Entry");

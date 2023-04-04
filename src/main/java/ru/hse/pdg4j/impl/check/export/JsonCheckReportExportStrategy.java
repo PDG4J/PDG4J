@@ -1,6 +1,7 @@
 package ru.hse.pdg4j.impl.check.export;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.hse.pdg4j.api.check.CheckReport;
 import ru.hse.pdg4j.api.check.CheckReportEntry;
 import ru.hse.pdg4j.api.check.CheckReportExportStrategy;
@@ -16,7 +17,7 @@ public class JsonCheckReportExportStrategy implements CheckReportExportStrategy<
     }
 
     public JsonCheckReportExportStrategy() {
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override

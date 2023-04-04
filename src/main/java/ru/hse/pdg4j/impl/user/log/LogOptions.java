@@ -3,7 +3,7 @@ package ru.hse.pdg4j.impl.user.log;
 import picocli.CommandLine;
 
 public class LogOptions {
-    @CommandLine.Option(names = "-v",
+    @CommandLine.Option(names = "-s",
             defaultValue = "false",
             description = "Set whether execution is silent",
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS)

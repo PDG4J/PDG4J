@@ -32,15 +32,11 @@ public abstract class CheckPipelineTask implements PipelineTask<CheckReportEntry
             entry.setPerformed(true);
             return new BasicPipelineTaskResult(entry.isSuccessful());
         } catch (PassCheckException e) {
-            return new BasicPipelineTaskResult(false, "pass");
+            entry.setPerformed(false);
+            throw e;
         } catch (CheckException e) {
             entry.setPerformed(true);
-            return new BasicPipelineTaskResult(false, "check failed");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new BasicPipelineTaskResult(
-                    false,
-                    "Internal error performing: failed to perform (" + e.getMessage() + ")");
+            throw e;
         }
     }
 
@@ -66,7 +62,7 @@ public abstract class CheckPipelineTask implements PipelineTask<CheckReportEntry
 
     protected void error(String error) {
         entry.getErrors().add(error);
-        throw new ErrorCheckException();
+        throw new ErrorCheckException(error);
     }
 
     protected void errorAndContinue(String error) {

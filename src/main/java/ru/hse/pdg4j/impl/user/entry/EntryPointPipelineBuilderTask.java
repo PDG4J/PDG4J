@@ -3,7 +3,7 @@ package ru.hse.pdg4j.impl.user.entry;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTaskResult;
 import ru.hse.pdg4j.api.check.task.NonContextualPipelineTask;
-import ru.hse.pdg4j.impl.user.BootstrapContext;
+import ru.hse.pdg4j.api.user.BootstrapContext;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 

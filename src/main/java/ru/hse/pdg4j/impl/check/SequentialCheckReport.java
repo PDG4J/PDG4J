@@ -20,7 +20,7 @@ public class SequentialCheckReport implements CheckReport {
     }
 
     @Override
-    public Collection<CheckReportEntry> getEntries() {
+    public List<CheckReportEntry> getEntries() {
         return entryList;
     }
 }

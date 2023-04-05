@@ -1,6 +1,6 @@
 package ru.hse.pdg4j.api.check;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface CheckReport {
     /**
@@ -15,7 +15,7 @@ public interface CheckReport {
      *
      * @return entry collection
      */
-    Collection<CheckReportEntry> getEntries();
+    List<CheckReportEntry> getEntries();
 
     /**
      * Export the report using specified strategy

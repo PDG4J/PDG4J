@@ -19,7 +19,7 @@ public class IdleCheckTask extends CheckPipelineTask {
     @Override
     public void perform(PipelineContext context) {
         if (!success) {
-            error("whoops");
+            error("Sample failure message");
         } else {
             success();
         }

@@ -54,7 +54,7 @@ public class TextCheckReportExportStrategy implements CheckReportExportStrategy<
     }
 
     private void writeCheckReportEntry(CheckReportEntry entry, StringBuilder builder) {
-        builder.append(entry.getName()).append(": ").append(entry.isSuccessful() ? "OK" : "FAIL");
+        builder.append(entry.getName());
         builder.append("\n");
         for (String warning : entry.getWarnings()) {
             builder.append("W: ").append(warning).append("\n");

@@ -55,8 +55,13 @@ public class Main {
         // Parsing prompted args
         try {
             commandLine.parseArgs(args);
+            if (commandLine.isUsageHelpRequested()) {
+                commandLine.usage(System.out);
+                return;
+            }
         } catch (CommandLine.ParameterException e) {
             System.err.println("Invalid usage: " + e.getMessage());
+            commandLine.usage(System.out);
             System.exit(-1);
         }
 

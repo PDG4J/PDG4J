@@ -18,13 +18,13 @@ public class ReportOptions {
     }
 
     static class Report {
-        @CommandLine.Option(names = "-r", fallbackValue = "true", description = "Whether to output a report or not", required = true)
+        @CommandLine.Option(names = {"-r", "--report"}, fallbackValue = "true", description = "Whether to output a report or not", required = true)
         private boolean writeReport;
 
-        @CommandLine.Option(names = "-rt", defaultValue = "TEXT", description = "Format in which the report is printed", required = true)
+        @CommandLine.Option(names = {"-rt", "--reportType"}, defaultValue = "TEXT", description = "Format in which the report is printed", required = true)
         private ReportExportType exportType;
 
-        @CommandLine.Option(names = "-rf", defaultValue = "report",
+        @CommandLine.Option(names = {"-rf", "--reportFile"}, defaultValue = "report",
                 description = "Specify the file in which the report is written." +
                         " If not specified, the output is printed to stdout instead",
                 required = true)

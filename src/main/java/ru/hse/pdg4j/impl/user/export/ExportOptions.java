@@ -14,10 +14,10 @@ public class ExportOptions {
     }
 
     static class Export {
-        @CommandLine.Option(names = "-ex", description = "A set of structures to export", required = true)
+        @CommandLine.Option(names = {"-ex", "--export"}, description = "A set of structures to export", required = true)
         private Set<ExportType> exportTypeSet;
 
-        @CommandLine.Option(names = "-exr", description = "Folder in which exported files are located", required = true)
+        @CommandLine.Option(names = {"-exr", "--exportRoot"}, description = "Folder in which exported files are located", required = true)
         private String exportRoot;
 
         public Set<ExportType> getExportTypeSet() {

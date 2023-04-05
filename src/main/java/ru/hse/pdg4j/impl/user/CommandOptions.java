@@ -15,6 +15,8 @@ public class CommandOptions {
     private LogOptions logOptions;
     @CommandLine.Mixin
     private ExportOptions exportOptions;
+    @CommandLine.Option(names = {"-h"}, usageHelp = true, description = "display the help message")
+    boolean usageHelpRequested;
 
     public LauncherOptions getLauncherOptions() {
         return launcherOptions;

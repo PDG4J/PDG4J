@@ -1,6 +1,7 @@
 package ru.hse;
 
 import redis.clients.jedis.JedisPool;
+import ru.hse.check.Check;
 
 public class Main {
 
@@ -51,8 +52,7 @@ public class Main {
         System.out.println("123");
     }
 
-
-    public static void main(String[] args) {
+    public static void someFunc(String[] args) {
         int a;
         int  b = 10;
         a = 3;
@@ -149,5 +149,17 @@ public class Main {
         while (a < 100) {
             System.out.println(1233);
         }
+    }
+
+
+    public static void main(String[] args) {
+        int a = 10, b = 10;
+        if (b < 10) {
+            System.out.println(Check.counter + b);
+        }
+        if (b < 10) {
+            System.out.println(Check.counter + b);
+        }
+        Check.counter = 1;
     }
 }

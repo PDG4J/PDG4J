@@ -6,6 +6,8 @@ import ru.hse.pdg4j.api.check.task.CheckPipelineTask;
 import ru.hse.pdg4j.api.check.task.NonContextualPipelineTask;
 import ru.hse.pdg4j.api.user.BootstrapContext;
 import ru.hse.pdg4j.impl.builder.PipelineGraphBuilder;
+import ru.hse.pdg4j.impl.check.builtin.DuplicateCodeCheckTask;
+import ru.hse.pdg4j.impl.check.builtin.DuplicateCodeInFunctionTask;
 import ru.hse.pdg4j.impl.task.basic.SourceInitialCheckTask;
 import ru.hse.pdg4j.impl.task.util.IdleCheckTask;
 
@@ -18,23 +20,15 @@ public class AddChecksPipelineBuilderTask extends NonContextualPipelineTask {
 
     @Override
     public PipelineTaskResult run(PipelineContext context) {
-        // TODO: maybe add checks' auto-recognition via annotations similar to Spring's approach
         BootstrapContext bootstrapContext = context.getSharedContext(BootstrapContext.class);
         PipelineGraphBuilder builder = bootstrapContext.getAnalysisGraphBuilder();
-        builder.task(new SourceInitialCheckTask());
-        builder.task(new IdleCheckTask("<Successful Check>").setSuccess(true).setBlocking(false));
-        builder.task(new IdleCheckTask("<Failed Check>").setSuccess(false).setBlocking(false));
-        builder.task(new CheckPipelineTask("<Skipped Check>") {
-            @Override
-            public void perform(PipelineContext context) {
-                pass("Sample skip message");
-            }
 
-            @Override
-            public boolean isBlocking() {
-                return false;
-            }
-        });
+        // Check for initial source code: compliance with Java 11, syntax errors, etc.
+        builder.task(new SourceInitialCheckTask());
+
+        // Builtin checks for duplicate code
+        builder.task(new DuplicateCodeCheckTask())
+                .task(new DuplicateCodeInFunctionTask());
 
         return success();
     }

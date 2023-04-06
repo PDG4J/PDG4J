@@ -34,8 +34,7 @@ public class MakeStructuresPipelineBuilderTask extends NonContextualPipelineTask
                 .task(new AddRegionalNodesTask())
                 .task(new DeleteAdditionalNodesTask())
                 .task(new DataFlowGraphTask())
-                .task(new ProgramDependenceGraphTask())
-        ;
+                .task(new ProgramDependenceGraphTask());
         return success();
     }
 }

@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 public class PrintUtils {
+    // TODO: handle the case with single node (or multiple nodes without any connections to each other)
     public static String pipelineGraphToDot(PipelineGraphNode root) {
         StringBuilder builder = new StringBuilder();
         builder.append("graph {\n");

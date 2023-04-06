@@ -16,13 +16,10 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlFlowGraphTask implements PipelineTask<ControlFlowGraphTask.Context> {
-    record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
-    }
+    private Context context;
 
     public ControlFlowGraphTask() {
     }
-
-    private Context context;
 
     @Override
     public String getName() {
@@ -48,5 +45,8 @@ public class ControlFlowGraphTask implements PipelineTask<ControlFlowGraphTask.C
 
     public List<Class<? extends PipelineTask<?>>> getRequirements() {
         return List.of(MethodExtractionTask.class);
+    }
+
+    public record Context(Map<CtMethod<?>, ControlFlowGraph> graphMap) implements PipelineTaskContext {
     }
 }

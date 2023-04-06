@@ -8,6 +8,7 @@ import ru.hse.pdg4j.impl.task.basic.LauncherTask;
 
 import java.io.File;
 
+import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class LauncherPipelineBuilderTask extends NonContextualPipelineTask {
@@ -19,9 +20,17 @@ public class LauncherPipelineBuilderTask extends NonContextualPipelineTask {
     public PipelineTaskResult run(PipelineContext context) {
         BootstrapContext bootstrapContext = context.getSharedContext(BootstrapContext.class);
         LauncherOptions launcherOptions = bootstrapContext.getOptions().getLauncherOptions();
+        File sourceFolder = new File(launcherOptions.getSourcePath());
+        if (!sourceFolder.exists()) {
+            return failure("Provided source path does not exist");
+        }
+        if (!sourceFolder.isDirectory()) {
+            return failure("Provided source path must resolve to a directory inside which the code is located");
+        }
+
         bootstrapContext.getAnalysisGraphBuilder()
                 .task(new LauncherTask(
-                        new File(launcherOptions.getSourcePath()),
+                        sourceFolder,
                         launcherOptions.getClasspath() == null
                                 ? null
                                 : launcherOptions.getClasspath().split(";")

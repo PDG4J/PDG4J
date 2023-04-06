@@ -4,10 +4,7 @@ import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
-import ru.hse.pdg4j.api.ExecutionListener;
-import ru.hse.pdg4j.api.PipelineContext;
-import ru.hse.pdg4j.api.PipelineGraphNode;
-import ru.hse.pdg4j.api.PipelineTask;
+import ru.hse.pdg4j.api.*;
 import ru.hse.pdg4j.api.plugin.Pdg4jExtension;
 import ru.hse.pdg4j.api.user.BootstrapContext;
 import ru.hse.pdg4j.impl.SimpleFlowPipeline;
@@ -30,8 +27,19 @@ public class Main {
     // for the main code analysis pipeline
     private static final ExecutionListener DIE_ON_FAILURE_LISTENER = new ExecutionListener() {
         @Override
+        public void onComplete(PipelineTask<?> pipelineTask,
+                               PipelineTaskResult result,
+                               PipelineGraphNode current,
+                               PipelineContext context) {
+            if (!result.isSuccessful()) {
+                System.err.println("Failed to setup the analysis: " + result.getMessage());
+                System.exit(-1);
+            }
+        }
+
+        @Override
         public void onException(PipelineTask<?> pipelineTask, PipelineGraphNode current, Exception e, PipelineContext context) {
-            System.err.println("Failed to setup PDG4J: " + e.getMessage());
+            System.err.println("Failed to setup the analysis due to an error: " + e.getMessage());
             e.printStackTrace();
             System.exit(-1);
         }

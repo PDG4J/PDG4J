@@ -14,6 +14,7 @@ import ru.hse.pdg4j.impl.task.graph.dfg.DataFlowExportTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeExportTask;
 
 import java.io.File;
+import ru.hse.pdg4j.impl.task.graph.pgd.ProgramDependenceGraphExportTask;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
@@ -38,6 +39,7 @@ public class ExportPipelineBuilderTask extends NonContextualPipelineTask {
                     case DFG -> builder.task(new DataFlowExportTask(exportRoot));
                     case CDGR -> builder.task(new AddRegionalNodesGraphExportTask(exportRoot));
                     case CDGRA -> builder.task(new DeleteAdditionalNodesExportTask(exportRoot));
+                    case PDG -> builder.task(new ProgramDependenceGraphExportTask(exportRoot));
                 }
             }
         }

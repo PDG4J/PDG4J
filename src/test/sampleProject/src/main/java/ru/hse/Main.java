@@ -1,8 +1,11 @@
 package ru.hse;
 
+import redis.clients.jedis.JedisPool;
+
 public class Main {
 
     public static void F() {
+        JedisPool pool = new JedisPool("localhost", 6379);
         int a = 3, b = 10;
 
         if (a == 1) {

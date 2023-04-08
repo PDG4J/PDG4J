@@ -4,9 +4,9 @@ import ru.hse.check.Check;
 
 public class Main {
 
-    public static void F() {
+    public static void F(int x) {
         int a = 3, b = 10;
-
+        x += 10;
         if (a == 1) {
             a += 1;
             a += 5;
@@ -23,7 +23,7 @@ public class Main {
         }else {
             System.out.println(1);
         }
-        System.out.println("123");
+        System.out.println(a + x);
     }
     public static void FF(int c) {
         int csadifgaosdigf;
@@ -158,6 +158,11 @@ public class Main {
         if (b < 10) {
             System.out.println(Check.counter + b);
         }
-        Check.counter = 1;
+        for (int i = 0; i < 10; ++i) {
+            if (i < 5) {
+                Check.counter = i;
+            }
+        }
+        System.out.println(Check.counter);
     }
 }

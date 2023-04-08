@@ -51,7 +51,7 @@ public class DataFlowGraphTask implements PipelineTask<DataFlowGraphTask.Context
 
         var graph = context.getContext(PreprocessControlFlowTask.Context.class).graphMap();
         graph.forEach((ctMethod, condtionalGraph) -> {
-            var newGraph = new DataFlowGraph(condtionalGraph);
+            var newGraph = new DataFlowGraph(condtionalGraph, ctMethod);
 
             graphMap.put(ctMethod, newGraph.getControlDependenceGraph());
         });

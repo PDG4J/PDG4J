@@ -31,6 +31,9 @@ import spoon.support.StandardEnvironment;
 import spoon.support.reflect.code.CtAssignmentImpl;
 import spoon.support.reflect.code.CtCommentImpl;
 import spoon.support.reflect.code.CtContinueImpl;
+import spoon.support.reflect.code.CtInvocationImpl;
+import spoon.support.reflect.code.CtLocalVariableImpl;
+import spoon.support.reflect.code.CtOperatorAssignmentImpl;
 import spoon.support.reflect.reference.CtVariableReferenceImpl;
 
 public class DataFlowGraph {
@@ -92,13 +95,26 @@ public class DataFlowGraph {
         return ans;
     }
 
-    private Pair<Collection<CtVariableReference>, Collection<CtVariableReference>> getVariables (CtElement statement) {
+    private Pair<Collection<CtVariableReference>, Collection<CtVariableReference>> getVariables (CtElement statement, boolean isStatement) {
         var controlFlowGraph = new ControlFlowGraph();
-        var beginNode = new ControlFlowNode(newCommend(null), controlFlowGraph, BranchKind.BEGIN);
-        var newNode = new ControlFlowNode(statement, controlFlowGraph,
-            BranchKind.STATEMENT);
-        var endNode = new ControlFlowNode(newCommend(null),
+        var beginNode = new ControlFlowNode(newCommend(), controlFlowGraph, BranchKind.BEGIN);
+
+        if (statement.getFactory() == null) {
+            statement.setFactory(
+                new FactoryImpl(new DefaultCoreFactory(), new StandardEnvironment()));
+        }
+        ControlFlowNode newNode;
+        if (isStatement) {
+            newNode = new ControlFlowNode(statement, controlFlowGraph,
+                BranchKind.STATEMENT);
+        } else {
+            newNode = new ControlFlowNode(statement, controlFlowGraph,
+                BranchKind.BRANCH);
+        }
+
+        var endNode = new ControlFlowNode(newCommend(),
             controlFlowGraph, BranchKind.EXIT);
+
         controlFlowGraph.addEdge(beginNode, newNode);
         controlFlowGraph.addEdge(newNode, endNode);
 
@@ -115,8 +131,34 @@ public class DataFlowGraph {
     private void processBlocks(ConditionalGraphNode node, ConditionalGraphNode parent, Map<String, List<ConditionalGraphNode>> variablesLinks, ConditionalGraph newGraph, Stack<ConditionalGraphNode> stack, List<Pair<ConditionalGraphNode, ConditionalGraphNode>> newPairs) {
         if (node.getKind() == BranchKind.BRANCH) {
             stack.add(node);
+            if (!(node.getStatement() instanceof CtCommentImpl)) {
+                var variables = getVariables(node.getStatement(), false);
+                var used = variables.second;
+
+                for (var variable : used) {
+                    var variableName = variable.prettyprint();
+                    if (variablesLinks.containsKey(variableName)) {
+                        for (var oldVar : variablesLinks.get(variableName)) {
+                            newPairs.add(new Pair<>(oldVar, node));
+                        }
+                    } else if (extraNodes.containsKey(variableName)) {
+                        var tmpNode = extraNodes.get(variableName);
+                        newPairs.add(new Pair<>(tmpNode, node));
+                        var lst = new ArrayList<ConditionalGraphNode>();
+                        lst.add(tmpNode);
+                        variablesLinks.put(variableName, lst);
+                    } else if (variableName.contains(".")) {
+                        var tmpNode = new ConditionalGraphNode(variable, newGraph);
+                        extraNodes.put(variableName, tmpNode);
+                        newPairs.add(new Pair<>(tmpNode, node));
+                        var lst = new ArrayList<ConditionalGraphNode>();
+                        lst.add(tmpNode);
+                        variablesLinks.put(variableName, lst);
+                    }
+                }
+            }
         } else if (node.getKind() == BranchKind.STATEMENT) {
-            var variables = getVariables(node.getStatement());
+            var variables = getVariables(node.getStatement(), true);
             var defined = variables.first;
             var used = variables.second;
 
@@ -133,9 +175,7 @@ public class DataFlowGraph {
                     lst.add(tmpNode);
                     variablesLinks.put(variableName, lst);
                 } else if (variableName.contains(".")) {
-                    var comment = newCommend(null);
-                    comment.setContent(variableName);
-                    var tmpNode = new ConditionalGraphNode(comment, newGraph);
+                    var tmpNode = new ConditionalGraphNode(variable, newGraph);
                     extraNodes.put(variableName, tmpNode);
                     newPairs.add(new Pair<>(tmpNode, node));
                     var lst = new ArrayList<ConditionalGraphNode>();
@@ -154,9 +194,7 @@ public class DataFlowGraph {
                     var tmpNode = extraNodes.get(variableName);
                     newPairs.add(new Pair<>(tmpNode, node));
                 } else if (variableName.contains(".")) {
-                    var comment = newCommend(null);
-                    comment.setContent(variableName);
-                    var tmpNode = new ConditionalGraphNode(comment, newGraph);
+                    var tmpNode = new ConditionalGraphNode(variable, newGraph);
                     extraNodes.put(variableName, tmpNode);
                     newPairs.add(new Pair<>(tmpNode, node));
                 }
@@ -274,7 +312,7 @@ public class DataFlowGraph {
                 loopNodes.add(target);
 
                 if (!tmpNodesMap.containsKey(target)) {
-                    var comment = newCommend(node.getStatement());
+                    var comment = newCommend();
                     var newNode = new ConditionalGraphNode(comment, newGraph, BranchKind.CONVERGE);
                     newGraph.addVertex(newNode);
                     newGraph.addEdge(newNode, target, ConditionalEdgeType.NONE, true);
@@ -311,11 +349,8 @@ public class DataFlowGraph {
 
         for (var parameter: this.methodInfo.getParameters()) {
             var variableName = parameter.getReference().toString();
-            var comment = newCommend(null);
-            comment.setContent(variableName);
-            var tmpNode = new ConditionalGraphNode(comment, newGraph);
+            var tmpNode = new ConditionalGraphNode(parameter, newGraph);
             extraNodes.put(variableName, tmpNode);
-
         }
 
         basicDfs(baseConditionalGraph.getStart(), newGraph);
@@ -332,13 +367,9 @@ public class DataFlowGraph {
         return newGraph;
     }
 
-    private CtCommentImpl newCommend(CtElement statement) {
+    private CtCommentImpl newCommend() {
         Factory factory;
-        if (statement == null) {
-            factory = new FactoryImpl(new DefaultCoreFactory(), new StandardEnvironment());
-        } else {
-            factory = statement.getFactory();
-        }
+        factory = new FactoryImpl(new DefaultCoreFactory(), new StandardEnvironment());
         var comment = new CtCommentImpl();
         comment.getFactory().getEnvironment();
         comment.setContent("R" + (counter.getAndIncrement()));

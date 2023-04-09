@@ -7,164 +7,43 @@ public class Main {
 
     public static void F(int x) {
         JedisPool pool = new JedisPool("localhost", 6379);
-        int a = 3, b = 10;
-        x += 10;
-        if (a == 1) {
-            a += 1;
-            a += 5;
-            System.out.println(a);
-        } else if (a == 2) {
-            if (b < 100) {
-                System.out.println("2");
-            } else {
-                System.out.println(12222222);
-            }
-            System.out.println(12333);
-        } else if (a == 3) {
-            System.out.println(123333);
-        }else {
-            System.out.println(1);
-        }
-        System.out.println(a + x);
     }
-    public static void FF(int c) {
-        int csadifgaosdigf;
-        int a = 3, b = 10;
-        c  = 10;
-        switch (a) {
-            case 1:
-                System.out.println(a);
-                break;
-            case 2:
-                if (b < 100) {
-                    System.out.println("2");
-                }else {
-                    System.out.println(12222222);
-                }
-                System.out.println(12333);
-                break;
-            case 3:
-                System.out.println(123333);
-                break;
-            default:
-                System.out.println(1);
-        }
-        System.out.println("123");
-    }
-
-    public static void someFunc(String[] args) {
-        int a;
-        int  b = 10;
-        a = 3;
-
-        if (a == 1) {
-            System.out.println(a + b);
-        }
-
-        if (a == 1) {
-            a = 5;
-            a *= 10;
-        }
-
-        if (a == 1) {
-
-            System.out.println(a);
-        } else if (a == 2) {
-            if (b < 100) {
-                System.out.println(a * 10 + b);
-                b *= 10 + a;
-            } else {
-                System.out.println(b);
-            }
-            System.out.println(a + b);
-        } else if (a == 3) {
-            System.out.println(a * a);
+    
+    public static int f1(int x) {
+        int a = 0 , b = 10;
+        if (a < 10) {
             a += 10;
-        }else {
-            System.out.println(b * 10);
+        } else {
+            a += 10;
         }
-        a *= 10;
-        System.out.println("123");
-        FF(123);
-
-        for (int k = 0; k < 100; ++k) {
-            if (a == 1) {
-                a += 2;
-                System.out.println(a + 2);
-            }
-            b += 100;
-            for (int i = 0; i < 1; ++i) {
-                if (a > 10) {
-                    System.out.println(12333);
-                    a += 10;
-                } else {
-                    System.out.println(122222);
-                    b += 100;
-                }
-                a = a + 10;
-                if (a > 10) {
-                    System.out.println(12333);
-                    continue;
-                } else {
-                    System.out.println(122222);
-                }
-                if (a > 10) {
-                    System.out.println(12333);
-                } else {
-                    System.out.println(122222);
-                    continue;
-                }
-                b = 10;
-                if (a > 10) {
-                    System.out.println(12333);
-                    continue;
-                }
-
-                if (a > 10) {
-                } else {
-                    continue;
-                }
-
-                System.out.println(123);
-                if (a > 10) {
-                    System.out.println(12333);
-                    continue;
-                } else {
-                    System.out.println(122222);
-                    continue;
-                }
-
-            }
+        if (a < 10) {
+            a += 10;
         }
-        for (int i = 0; i < 10; ++i ) {
-            if (a < 10) {
-                System.out.println(12333);
-                a += 10;
-                continue;
-            } else {
-                continue;
-            }
-        }
+        b += 10;
+        a *= 100;
+        System.out.println(a + b);
+        return b + a;
+    }
 
-        while (a < 100) {
-            System.out.println(1233);
+    public static int f2(int y) {
+        int a = 0 , b = 10;
+        if (a < 10) {
+            a += 10;
+        } else {
+            a += 10;
         }
+        b += 10;
+        if (a < 10) {
+            a += 10;
+        }
+        a *= 100;
+        System.out.println(a + b);
+        return b + a;
     }
 
 
     public static void main(String[] args) {
-        int a = 10, b = 10;
-        if (b < 10) {
-            System.out.println(Check.counter + b);
-        }
-        if (b < 10) {
-            System.out.println(Check.counter + b);
-        }
-        for (int i = 0; i < 10; ++i) {
-            if (i < 5) {
-                Check.counter = i;
-            }
-        }
-        System.out.println(Check.counter);
+        System.out.println(f1(1));
+        System.out.println(f2(1));
     }
 }

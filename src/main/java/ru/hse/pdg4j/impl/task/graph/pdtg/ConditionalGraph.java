@@ -138,24 +138,32 @@ public class ConditionalGraph extends DefaultDirectedGraph<ConditionalGraphNode,
         if (vertexSet().size() == 0) {
             return null;
         }
-        return this.vertexSet().stream().min(new Comparator<ConditionalGraphNode>() {
-            @Override
-            public int compare(ConditionalGraphNode o1, ConditionalGraphNode o2) {
-                return Integer.compare(inDegreeOf(o1), inDegreeOf(o2));
+        ConditionalGraphNode node = null;
+        for (var vertex: this.vertexSet()) {
+            if (this.inDegreeOf(vertex) == 0) {
+                node = vertex;
+                if (vertex.getKind() == BranchKind.BEGIN || vertex.getKind() == BranchKind.BRANCH){
+                    return vertex;
+                }
             }
-        }).get();
+        }
+        return node;
     }
 
     public ConditionalGraphNode getEnd() {
         if (vertexSet().size() == 0) {
             return null;
         }
-        return this.vertexSet().stream().min(new Comparator<ConditionalGraphNode>() {
-            @Override
-            public int compare(ConditionalGraphNode o1, ConditionalGraphNode o2) {
-                return Integer.compare(outDegreeOf(o1), outDegreeOf(o2));
+        ConditionalGraphNode node = null;
+        for (var vertex: this.vertexSet()) {
+            if (this.outDegreeOf(vertex) == 0) {
+                node = vertex;
+                if (vertex.getKind() == BranchKind.EXIT){
+                    return vertex;
+                }
             }
-        }).get();
+        }
+        return node;
     }
 
     public String toGraphVisText() {

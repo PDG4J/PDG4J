@@ -19,7 +19,7 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class AddRegionalNodesGraphExportTask implements PipelineTask<IdleTask.Context> {
     private final File destinationFolder;
-    private final String controlDependenct = "CDG+R";
+    private final String exportFilePrefix = "CDG_with_regional_nodes_";
 
     public AddRegionalNodesGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
@@ -45,7 +45,7 @@ public class AddRegionalNodesGraphExportTask implements PipelineTask<IdleTask.Co
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, controlDependenct + ctMethod.getSignature());
+            File destination = new File(destinationFolder, exportFilePrefix + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

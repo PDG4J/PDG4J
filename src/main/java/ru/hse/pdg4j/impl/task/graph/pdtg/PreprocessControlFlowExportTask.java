@@ -17,7 +17,7 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PreprocessControlFlowExportTask implements PipelineTask<IdleTask.Context> {
-    private static final String pdtg = "PCFG";
+    private static final String exportFilePrefix = "PCFG_";
     private final File destinationFolder;
 
     public PreprocessControlFlowExportTask(File destinationFolder) {
@@ -45,7 +45,7 @@ public class PreprocessControlFlowExportTask implements PipelineTask<IdleTask.Co
             CtMethod<?> ctMethod = entry.getKey();
 
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, pdtg + ctMethod.getSignature());
+            File destination = new File(destinationFolder, exportFilePrefix + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

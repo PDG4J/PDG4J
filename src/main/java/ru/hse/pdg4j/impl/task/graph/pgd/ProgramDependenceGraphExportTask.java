@@ -12,14 +12,13 @@ import java.util.Map;
 import ru.hse.pdg4j.api.PipelineContext;
 import ru.hse.pdg4j.api.PipelineTask;
 import ru.hse.pdg4j.api.PipelineTaskResult;
-import ru.hse.pdg4j.impl.task.graph.cdg.DeleteAdditionalNodesTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import spoon.reflect.declaration.CtMethod;
 
 public class ProgramDependenceGraphExportTask implements PipelineTask<IdleTask.Context> {
     private final File destinationFolder;
-    private final String controlDependenct = "PDG";
+    private final String exportFilePrefix = "PDG_";
 
     public ProgramDependenceGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
@@ -45,7 +44,7 @@ public class ProgramDependenceGraphExportTask implements PipelineTask<IdleTask.C
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, controlDependenct + ctMethod.getSignature());
+            File destination = new File(destinationFolder, exportFilePrefix + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

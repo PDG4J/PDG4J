@@ -42,7 +42,7 @@ public class DeleteAdditionalNodesTask implements PipelineTask<DeleteAdditionalN
             var info = entry.getValue();
             var graph = new ConditionalGraph();
 
-            var kindToDelete = List.of(BranchKind.BLOCK_BEGIN, BranchKind.BLOCK_END, BranchKind.CONVERGE);
+            var kindToDelete = List.of(BranchKind.BEGIN, BranchKind.EXIT, BranchKind.BLOCK_BEGIN, BranchKind.BLOCK_END, BranchKind.CONVERGE);
             for (var edge : info.edgeSet()) {
                 if (kindToDelete.contains(edge.getSource().getKind()) || kindToDelete.contains(edge.getTarget().getKind())) {
                     continue;

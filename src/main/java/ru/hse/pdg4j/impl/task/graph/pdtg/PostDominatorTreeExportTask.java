@@ -17,7 +17,7 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PostDominatorTreeExportTask implements PipelineTask<IdleTask.Context> {
-    private static final String pdtg = "PDTG";
+    private static final String exportFilePrefix = "PDTG_";
     private final File destinationFolder;
 
     public PostDominatorTreeExportTask(File destinationFolder) {
@@ -45,7 +45,7 @@ public class PostDominatorTreeExportTask implements PipelineTask<IdleTask.Contex
             CtMethod<?> ctMethod = entry.getKey();
 
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, pdtg + ctMethod.getSignature());
+            File destination = new File(destinationFolder, exportFilePrefix + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

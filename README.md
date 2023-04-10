@@ -9,8 +9,8 @@ Our team has made a [fork](https://github.com/pdg4j/spoon) of it to bump up mave
 
 First of all, we need to install these packages locally:
 ```shell
-mkdir spoon && cd spoon && git clone https://github.com/PDG4J/spoon .
-mvn clean install -DskipTests -Dcheckstyle.skip
+mkdir spoon && cd spoon && git clone https://github.com/PDG4J/spoon . && cd spoon-control-flow
+mvn -DskipTests -Dcheckstyle.skip -am install
 ```
 
 Then we can build PDG4J itself:

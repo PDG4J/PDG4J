@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +15,6 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.jgrapht.alg.util.Pair;
-import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalEdge;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalEdgeType;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraphNode;
@@ -28,13 +26,8 @@ import spoon.reflect.factory.FactoryImpl;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.DefaultCoreFactory;
 import spoon.support.StandardEnvironment;
-import spoon.support.reflect.code.CtAssignmentImpl;
 import spoon.support.reflect.code.CtCommentImpl;
 import spoon.support.reflect.code.CtContinueImpl;
-import spoon.support.reflect.code.CtInvocationImpl;
-import spoon.support.reflect.code.CtLocalVariableImpl;
-import spoon.support.reflect.code.CtOperatorAssignmentImpl;
-import spoon.support.reflect.reference.CtVariableReferenceImpl;
 
 public class DataFlowGraph {
 
@@ -97,7 +90,7 @@ public class DataFlowGraph {
 
     private Pair<Collection<CtVariableReference>, Collection<CtVariableReference>> getVariables (CtElement statement, boolean isStatement) {
         var controlFlowGraph = new ControlFlowGraph();
-        var beginNode = new ControlFlowNode(newCommend(), controlFlowGraph, BranchKind.BEGIN);
+        var beginNode = new ControlFlowNode(newComment(), controlFlowGraph, BranchKind.BEGIN);
 
         if (statement.getFactory() == null) {
             statement.setFactory(
@@ -112,7 +105,7 @@ public class DataFlowGraph {
                 BranchKind.BRANCH);
         }
 
-        var endNode = new ControlFlowNode(newCommend(),
+        var endNode = new ControlFlowNode(newComment(),
             controlFlowGraph, BranchKind.EXIT);
 
         controlFlowGraph.addEdge(beginNode, newNode);
@@ -312,7 +305,7 @@ public class DataFlowGraph {
                 loopNodes.add(target);
 
                 if (!tmpNodesMap.containsKey(target)) {
-                    var comment = newCommend();
+                    var comment = newComment();
                     var newNode = new ConditionalGraphNode(comment, newGraph, BranchKind.CONVERGE);
                     newGraph.addVertex(newNode);
                     newGraph.addEdge(newNode, target, ConditionalEdgeType.NONE, true);
@@ -338,7 +331,7 @@ public class DataFlowGraph {
         }
     }
 
-    public ConditionalGraph getControlDependenceGraph() {
+    public ConditionalGraph getDataFlowGraph() {
         init();
 
         ConditionalGraph newGraph = new ConditionalGraph();
@@ -367,7 +360,7 @@ public class DataFlowGraph {
         return newGraph;
     }
 
-    private CtCommentImpl newCommend() {
+    private CtCommentImpl newComment() {
         Factory factory;
         factory = new FactoryImpl(new DefaultCoreFactory(), new StandardEnvironment());
         var comment = new CtCommentImpl();

@@ -4,8 +4,8 @@ import ru.hse.check.Check;
 
 public class Main {
 
-    public static int f1(int x) {
-        int a = 0 , b = 10;
+    public static void f1(int x) {
+        int a = 0, b = 10;
         if (a < 10) {
             a += 10;
         } else {
@@ -17,11 +17,10 @@ public class Main {
         b += 10;
         a *= 100;
         System.out.println(a + b);
-        return b + a;
     }
 
-    public static int f2(int y) {
-        int a = 0 , b = 10;
+    public static void f2() {
+        int a = 0, b = 10;
         if (a < 10) {
             a += 10;
         } else {
@@ -33,12 +32,85 @@ public class Main {
         }
         a *= 100;
         System.out.println(a + b);
-        return b + a;
+    }
+
+    public static void f3(int x) {
+        int a = 0, b = 10;
+        if (a < 10) {
+            a += 10;
+        } else {
+            if (a < 10) {
+                a += 10;
+            } else {
+                a += 10;
+            }
+            if (a < 10) {
+                a += 10;
+            }
+            b += 10;
+        }
+        if (a < 10) {
+            a += 10;
+        }
+        b += 10;
+        a *= 100;
+        System.out.println(a + b);
+    }
+
+    public static void f4() {
+        int a = 0, b = 10;
+        if (a < 10) {
+            a += 10;
+        } else {
+            if (a < 10) {
+                a += 10;
+            } else {
+                a += 10;
+            }
+            b += 10;
+            if (a < 10) {
+                a += 10;
+            }
+        }
+        b += 10;
+        if (a < 10) {
+            a += 10;
+        }
+        a *= 100;
+        System.out.println(a + b);
+    }
+
+    public static void f5(int a) {
+        int  b = 10, c = 3;
+        if (a < 10) {
+            System.out.println(a + b);
+        }
+        if (a < 10) {
+            System.out.println(a + b);
+        }
+        System.out.println(a + b);
+    }
+
+    public static void check1(int x) {
+        int a = 0, b = 10;
+        if (a < 10) {
+            a += 10;
+        } else {
+            a += 10;
+        }
+        System.out.println(a);
+    }
+
+    public static void check2(int x) {
+        int a = 0, b = 10;
+        for (int i = 0; i < 10; ++i) {
+            System.out.println(a);
+        }
+        System.out.println(a);
     }
 
 
     public static void main(String[] args) {
-        System.out.println(f1(1));
-        System.out.println(f2(1));
+        f4();
     }
 }

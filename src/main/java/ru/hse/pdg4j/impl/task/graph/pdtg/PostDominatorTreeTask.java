@@ -14,6 +14,7 @@ import java.util.Map;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask.Context> {
+
     private Context context;
 
     public PostDominatorTreeTask() {
@@ -40,7 +41,7 @@ public class PostDominatorTreeTask implements PipelineTask<PostDominatorTreeTask
             PostDominatorTree postDominatorTreeGraph = new PostDominatorTree();
 
             var edges = conditionalGraph.edgeSet();
-            for (var edge : edges) {
+            for (var edge: edges) {
                 postDominatorTreeGraph.addEdge(edge.getTarget(), edge.getSource(), edge.getType(), edge.isBackEdge());
             }
 

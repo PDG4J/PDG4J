@@ -30,7 +30,7 @@ public class PostDominatorTree {
         dom = new LinkedHashMap<>();
         ancestor = new LinkedHashMap<>();
         label = new LinkedHashMap<>();
-        for (var v : graph.vertexSet()) {
+        for (var v: graph.vertexSet()) {
             semi.put(v, 0);
             ancestor.put(v, null);
             label.put(v, v);
@@ -51,7 +51,7 @@ public class PostDominatorTree {
         semi.put(node, ++counter);
         vertexes.put(counter, node);
         var edges = graph.outgoingEdgesOf(node);
-        for (var edge : edges) {
+        for (var edge: edges) {
             var target = edge.getTarget();
             if (semi.get(target) == 0) {
                 parent.put(target, node);
@@ -90,7 +90,7 @@ public class PostDominatorTree {
             createPostDominatorTree();
         }
         ConditionalGraph newGraph = new ConditionalGraph();
-        for (var v : graph.vertexSet()) {
+        for (var v: graph.vertexSet()) {
             if (dom.get(v) == null) {
                 continue;
             }
@@ -121,8 +121,8 @@ public class PostDominatorTree {
             }
         }).limit(n - 1).collect(Collectors.toList());
 
-        for (var w : vers) {
-            for (var v : pred(w)) {
+        for (var w: vers) {
+            for (var v: pred(w)) {
                 var node = EVAL(v);
                 if (semi.get(node) < semi.get(w)) {
                     semi.put(w, semi.get(node));
@@ -130,7 +130,7 @@ public class PostDominatorTree {
             }
             addToBucket(vertexes.get(semi.get(w)), w);
             Link(parent.get(w), w);
-            for (var v : bucket.getOrDefault(parent.get(w), new HashSet<>())) {
+            for (var v: bucket.getOrDefault(parent.get(w), new HashSet<>())) {
                 var node = EVAL(v);
                 if (semi.get(node) < semi.get(v)) {
                     dom.put(v, node);

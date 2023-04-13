@@ -20,7 +20,7 @@ import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
 public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.Context> {
     private final File destinationFolder;
-    private final String controlDependenct = "CDG";
+    private final String exportFilePrefix = "CDG_";
 
     public ControlDependenceGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
@@ -46,7 +46,7 @@ public class ControlDependenceGraphExportTask implements PipelineTask<IdleTask.C
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
             ConditionalGraph controlFlowGraph = entry.getValue();
-            File destination = new File(destinationFolder, controlDependenct + ctMethod.getSignature());
+            File destination = new File(destinationFolder, exportFilePrefix + ctMethod.getSignature());
             if (!destination.exists()) {
                 try {
                     destination.createNewFile();

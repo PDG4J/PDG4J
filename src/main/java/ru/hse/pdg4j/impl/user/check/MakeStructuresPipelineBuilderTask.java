@@ -13,6 +13,7 @@ import ru.hse.pdg4j.impl.task.graph.cfg.ControlFlowGraphTask;
 import ru.hse.pdg4j.impl.task.graph.dfg.DataFlowGraphTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PostDominatorTreeTask;
 import ru.hse.pdg4j.impl.task.graph.pdtg.PreprocessControlFlowTask;
+import ru.hse.pdg4j.impl.task.graph.pgd.ProgramDependenceGraphTask;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
 
@@ -32,7 +33,9 @@ public class MakeStructuresPipelineBuilderTask extends NonContextualPipelineTask
                 .task(new ControlDependenceGraphTask())
                 .task(new AddRegionalNodesTask())
                 .task(new DeleteAdditionalNodesTask())
-                .task(new DataFlowGraphTask());
+                .task(new DataFlowGraphTask())
+                .task(new ProgramDependenceGraphTask())
+        ;
         return success();
     }
 }

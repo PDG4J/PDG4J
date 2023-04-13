@@ -1,4 +1,4 @@
-package ru.hse.pdg4j.impl.task.graph.dfg;
+package ru.hse.pdg4j.impl.task.graph.pgd;
 
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.failure;
 import static ru.hse.pdg4j.impl.SimplePipelineTaskResult.success;
@@ -16,17 +16,17 @@ import ru.hse.pdg4j.impl.task.graph.pdtg.ConditionalGraph;
 import ru.hse.pdg4j.impl.task.util.IdleTask;
 import spoon.reflect.declaration.CtMethod;
 
-public class DataFlowExportTask implements PipelineTask<IdleTask.Context> {
-    private File destinationFolder;
-    private String exportFilePrefix = "DF_";
+public class ProgramDependenceGraphExportTask implements PipelineTask<IdleTask.Context> {
+    private final File destinationFolder;
+    private final String exportFilePrefix = "PDG_";
 
-    public DataFlowExportTask(File destinationFolder) {
+    public ProgramDependenceGraphExportTask(File destinationFolder) {
         this.destinationFolder = destinationFolder;
     }
 
     @Override
     public String getName() {
-        return "Export data flow graph";
+        return "Export ProgramDependenceGraph";
     }
 
     @Override
@@ -39,7 +39,8 @@ public class DataFlowExportTask implements PipelineTask<IdleTask.Context> {
         if (!destinationFolder.exists()) {
             destinationFolder.mkdirs();
         }
-        var graphContext = context.getContext(DataFlowGraphTask.Context.class);
+
+        var graphContext = context.getContext(ProgramDependenceGraphTask.Context.class);
         for (Map.Entry<CtMethod<?>, ConditionalGraph> entry : graphContext.graphMap().entrySet()) {
             CtMethod<?> ctMethod = entry.getKey();
             ConditionalGraph controlFlowGraph = entry.getValue();
@@ -63,6 +64,6 @@ public class DataFlowExportTask implements PipelineTask<IdleTask.Context> {
 
     @Override
     public Collection<Class<? extends PipelineTask<?>>> getRequirements() {
-        return List.of(DataFlowGraphTask.class);
+        return List.of(ProgramDependenceGraphTask.class);
     }
 }
